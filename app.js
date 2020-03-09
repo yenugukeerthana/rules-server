@@ -1,3 +1,6 @@
+require("@babel/register")({
+  presets: ["@babel/preset-env"]
+});
 var express = require('express')
 var app = express()
 
