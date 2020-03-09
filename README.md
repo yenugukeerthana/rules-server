@@ -26,13 +26,13 @@ Run the sql script in the application folder using the psql command line to crea
 Ensure that psql is configured in the windows environment variables
 
 ```psql
-psql -U <username> -f player.sql
+psql -U <username> -f openchs.sql
 ```
 
 ##Configuration
 Ensure that the server/db.js file postgres database connection is updated. Below find the standard configuration
 ```
-var connectionString = 'postgres://postgres:root@localhost:5432/tmc';
+var connectionString = 'postgres://postgres:root@localhost:5432/openchs';
 ```
 
 

@@ -1,19 +1,14 @@
 var promise = require('bluebird');
-// var rulesConfig = require("rules-config");
-// var lodash =require("lodash");
-// var moment= require("moment");
 import lodash from 'lodash';
 import moment from 'moment';
 import * as rulesConfig from 'rules-config';
 
 var options = {
-  // Initialization Options
   promiseLib: promise
 };
 
 var pgp = require('pg-promise')(options);
 var connectionString = 'postgres://localhost:5432/openchs';
-// var connectionString = 'postgres://localhost:5432/tmc';
 var db = pgp(connectionString);
 
 
@@ -90,10 +85,5 @@ function getIndividualUUID(entity, entityName){
 };
 
 module.exports = {
-  getAllPlayers: getAllPlayers,
-  getSinglePlayer: getSinglePlayer,
-  createPlayer: createPlayer,
-  updatePlayer: updatePlayer,
-  deletePlayer: deletePlayer,
   generateRules: generateRules
 };
