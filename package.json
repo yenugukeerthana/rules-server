@@ -10,7 +10,8 @@
     "moment": "^2.22.2",
     "pg-promise": "^5.3.5",
     "rules-config": "github:openchs/rules-config#08202533ec3f3a55977946c69d204f3df8080e61",
-    "babel-plugin-module-resolver": "^3.2.0"
+    "babel-plugin-module-resolver": "^3.2.0",
+    "openchs-models": "0.2.10"
   },
   "devDependencies": {
     "@babel/core": "7.4.4",
