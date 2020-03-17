@@ -5,7 +5,6 @@ import {validateDecisions, trimDecisionsMap} from './service/RuleEvaluationServi
 import {createEntity} from './models/programEncounterModels';
 
 export const programEnocunter = (text) => {
-    console.log(text);
     const defaultDecisions = {
         "enrolmentDecisions": [],
         "encounterDecisions": [],
@@ -17,8 +16,7 @@ export const programEnocunter = (text) => {
       params: { decisions: defaultDecisions, entity },
       imports: { rulesConfig, lodash, moment }
   });
-  console.log(JSON.stringify(ruleDecisions));
-  const decisionsMap = validateDecisions(ruleDecisions, "38a778be-991f-40f0-9837-7244836ecdfc", "35253eab-6594-4bad-9243-ca6ef15fc054");
-  const trimmedDecisions = trimDecisionsMap(decisionsMap);
-  return trimmedDecisions;
+//   const decisionsMap = validateDecisions(ruleDecisions, "38a778be-991f-40f0-9837-7244836ecdfc", "35253eab-6594-4bad-9243-ca6ef15fc054");
+//   const trimmedDecisions = trimDecisionsMap(decisionsMap);
+  return ruleDecisions;
 }
