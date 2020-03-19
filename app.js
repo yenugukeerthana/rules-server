@@ -1,6 +1,8 @@
 require("@babel/register")({
   presets: ["@babel/preset-env"]
 });
+require("@babel/polyfill");
+
 var express = require('express')
 var app = express()
 

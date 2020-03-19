@@ -5,20 +5,21 @@ class BaseService {
         this.db = db;
     }
 
-    findAllByKey(keyName, value, schemaName) {
-        return this.findAllByCriteria(`${keyName}='${value}'`, schemaName);
+    async findAllByKey(keyName, value, schemaName) {
+        return await this.findAllByCriteria(`${keyName}='${value}'`, schemaName);
     }
 
-    findAllByCriteria(filterCriteria, schema) {
-        return this.db.any('SELECT * FROM '+ schema+ ' WHERE '+filterCriteria);
+    async findAllByCriteria(filterCriteria, schema) {
+        return await this.db.any('SELECT * FROM '+ schema+ ' WHERE '+filterCriteria);
     }
 
-    findAll(schema = this.getSchema()) {
-        return this.db.any(`SELECT * FROM `+schema);
+    async findAll(schema = this.getSchema()) {
+        return await this.db.any(`SELECT * FROM `+schema);
     }
 
-    findByKey(keyName, value, schemaName = this.getSchema()) {
-        const entities = this.findAllByKey(keyName, value, schemaName);
+    async findByKey(keyName, value, schemaName = this.getSchema()) {
+        const entities = await this.findAllByKey(keyName, value, schemaName);
+        console.log(`====> ${JSON.stringify(entities)}`)
         return this.getReturnValue(entities);
     }
 

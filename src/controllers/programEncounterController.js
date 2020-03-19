@@ -3,14 +3,14 @@ import {programEnocunter} from '../RuleExecutor';
 
 function generateRules(req, res, next) {
   rulesService.findRulesById(req, res, next) 
-    .then(function (data) {
-        const rulevalidated = programEnocunter(JSON.parse(JSON.stringify(data))[0].rules);
+    .then(async function (data) {
+        const rulevalidated = await programEnocunter(JSON.parse(JSON.stringify(data))[0].rules);
         res.status(200)
-          .json({
-            status: 'success',
-            data: rulevalidated
-          });
-      })
+            .json({
+                status: 'success',
+                data: rulevalidated
+            });
+    })
       .catch(function (err) {
         return next(err);
       });
