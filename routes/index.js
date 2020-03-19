@@ -1,7 +1,7 @@
 var express = require('express');
 var router = express.Router();
 
-var db = require('../server/db');
+var programEncounterController = require('../src/controllers/programEncounterController');
 
-router.get('/api/rules', db.generateRules);
+router.get('/api/rules', programEncounterController.generateRules);
 module.exports = router;

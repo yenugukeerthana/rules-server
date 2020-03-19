@@ -1,29 +1,49 @@
+import conceptService from '../service/ConceptService';
+
 export const validateDecisions = (decisionsMap, ruleUUID, individualUUID) => {
     return _.merge(..._.map(decisionsMap, (decisions, decisionType) => {
         return {
             [decisionType]: decisions
-                .filter(decision => checkConceptForRule(decision.name, ruleUUID, individualUUID))
-                .map(decision => filterValues(decision, ruleUUID, individualUUID))
+                .filter(decision => {
+                   let data = checkConceptForRule(decision.name, ruleUUID, individualUUID);
+                   console.log("$$$$$$$$$$$$",data);
+                   return data
+                })
+                // .map(decision => filterValues(decision.value, ruleUUID, individualUUID))
         }
     }));
   }
   
  const checkConceptForRule = (conceptName, ruleUUID, individualUUID) => {
+    // return conceptService.findConcept(conceptName)
+    // .then(function (data) {
+    //     return true;
+    // })
+    // .catch(function (err) {
+    // // this.saveFailedRules(error, ruleUUID, individualUUID); -- need to insert entry in table
+    // console.log(`No concept found for ${conceptName}`);
+    // return false;
+    // });
     try {
     //   console.log(conceptName, ruleUUID, individualUUID );
-        // this.conceptService.findConcept(conceptName);
+        conceptService.findConcept(conceptName);
         return true;
-    } catch (error) {
-        // this.saveFailedRules(error, ruleUUID, individualUUID);
+        } catch (error) {
+            console.log("IN Error");
+         // this.saveFailedRules(error, ruleUUID, individualUUID);
         return false;
-    }
+        }
+        
   }
   
   const filterValues = (decision, ruleUUID, individualUUID) => {
-    // const nameConcept = this.conceptService.findConcept(decision.name);
-    const nameConcept = 'Coded';
-    decision.value = nameConcept.datatype !== 'Coded' ? decision.value : decision.value.filter(conceptName => checkConceptForRule(conceptName, ruleUUID, individualUUID));
-    return decision;
+      console.log("IN Filter Values");
+    conceptService.findConcept(decision)
+    .then(function (nameConcept) {
+        console.log(nameConcept);
+        decision.value = nameConcept.datatype !== 'Coded' ? decision.value : decision.value.filter(conceptName => checkConceptForRule(conceptName, ruleUUID, individualUUID));
+        return decision;
+    })
   }
   
 export const trimDecisionsMap = (decisionsMap) => {
