@@ -6,7 +6,7 @@ class BaseService {
     }
 
     async findAllByKey(keyName, value, schemaName) {
-        return await this.findAllByCriteria(`${keyName}='${value}'`, schemaName);
+        return await this.findAllByCriteria(`${keyName}="${value}"`, schemaName);
     }
 
     async findAllByCriteria(filterCriteria, schema) {
