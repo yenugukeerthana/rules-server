@@ -1,62 +1,55 @@
 import conceptService from '../service/ConceptService';
 import _ from "lodash";
-import Concept from 'openchs-models/dist/Concept';
 
 export const validateDecisions = async (decisionsMap, ruleUUID, individualUUID) => {
-    let an = await _.merge(..._.map(decisionsMap, async (decisions, decisionType) => {
-        let data = await decisions.filter(async decision => {
-            let data = await checkConceptForRule(decision.name, ruleUUID, individualUUID);
-            console.log("IN FILTER", data);
-            return data
-        })
-        let ans = data
-        .map(async decision =>{ let fdata = await filterValues(decision, ruleUUID, individualUUID)
-            console.log("IN MAP"+JSON.stringify(fdata));
-            return fdata;
-        });
-        return {
-            [decisionType]: ans
-        }
+    await Promise.all(_.map(decisionsMap, async (value, key) => {
+        const finalDecisions = [];
+        const decisions = decisionsMap[key];
+
+        await Promise.all(decisions.map(async decision => {
+            const nameConcept = await checkConceptForRule(decision.name, ruleUUID, individualUUID);
+            if (nameConcept) {
+                if (nameConcept["data_type"] === "Coded") {
+                    const finalValue = [];
+                    await Promise.all(decision.value.map(async answerConceptName => {
+                        const answerConcept = await checkConceptForRule(answerConceptName, ruleUUID, individualUUID);
+                        if (answerConcept) {
+                            finalValue.push(answerConceptName);
+                        }
+                    }));
+                    decision.value = finalValue;
+                }
+                finalDecisions.push(decision);
+                console.log(`RuleEvaluationService: finalDecisions ${JSON.stringify(finalDecisions)}`);
+            }
+        }));
+        console.log(`RuleEvaluationService: here`);
+
+        decisionsMap[key] = finalDecisions;
     }));
-    console.log("ok"+JSON.stringify(an));
-    return an;
+    return decisionsMap;
 }
-  
- const checkConceptForRule = async (conceptName, ruleUUID, individualUUID) => {
-    try{ 
-        return await conceptService.findConcept(conceptName).then(function (data) {
-            return true;
-        });
-    }catch(error){
-        conceptService.addRuleFailureTelemetric(conceptName, ruleUUID, individualUUID,error);
-        return false;
+
+const checkConceptForRule = async (conceptName, ruleUUID, individualUUID) => {
+    try {
+        const concept = await conceptService.findConcept(conceptName);
+        return concept;
+    } catch (error) {
+        console.log(`RuleEvaluationService: error ${error}`);
+        conceptService.addRuleFailureTelemetric(ruleUUID, individualUUID, error);
+        return null;
     }
- }
-  
-  const filterValues = async (decision, ruleUUID, individualUUID) => {
-    try{ 
-     return await conceptService.findConcept(decision.name)
-        .then(function (conceptData) {
-            const nameConcept = new Concept();
-            nameConcept.datatype = conceptData["data_type"];
-            // console.log(nameConcept);
-            decision.value = nameConcept.datatype !== 'Coded' ? decision.value : decision.value.filter(conceptName => checkConceptForRule(conceptName, ruleUUID, individualUUID));
-            return decision;
-        })
-    }catch(error){
-        return false;
-    }
-  }
-  
+}
+
 export const trimDecisionsMap = (decisionsMap) => {
     const trimmedDecisions = {};
     _.forEach(decisionsMap, (decisions, decisionType) => {
         trimmedDecisions[decisionType] = _.reject(decisions, _.isEmpty);
     });
     return trimmedDecisions;
-  };
-  
-  function getIndividualUUID(entity, entityName){
+};
+
+function getIndividualUUID(entity, entityName) {
     switch (entityName) {
         case 'Individual':
             return entity.uuid;
@@ -71,4 +64,4 @@ export const trimDecisionsMap = (decisionsMap) => {
         default:
             return "entity not mapped";
     }
-  };
+};
