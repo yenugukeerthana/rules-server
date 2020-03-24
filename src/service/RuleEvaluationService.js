@@ -3,26 +3,28 @@ import _ from "lodash";
 import Concept from 'openchs-models/dist/Concept';
 
 export const validateDecisions = async (decisionsMap, ruleUUID, individualUUID) => {
-    return await _.merge(..._.map(decisionsMap, async (decisions, decisionType) => {
+    let an = await _.merge(..._.map(decisionsMap, async (decisions, decisionType) => {
+        let data = await decisions.filter(async decision => {
+            let data = await checkConceptForRule(decision.name, ruleUUID, individualUUID);
+            console.log("IN FILTER", data);
+            return data
+        })
+        let ans = data
+        .map(async decision =>{ let fdata = await filterValues(decision, ruleUUID, individualUUID)
+            console.log("IN MAP"+JSON.stringify(fdata));
+            return fdata;
+        });
         return {
-            [decisionType]: await decisions
-                .filter(async decision => {
-                    let data = await checkConceptForRule(decision.name, ruleUUID, individualUUID);
-                    console.log("IN FILTER", data);
-                    return data
-                })
-            .map(async decision =>{ let fdata = await filterValues(decision, ruleUUID, individualUUID)
-                console.log("IN MAP");
-                return fdata;
-            })
+            [decisionType]: ans
         }
     }));
+    console.log("ok"+JSON.stringify(an));
+    return an;
 }
   
  const checkConceptForRule = async (conceptName, ruleUUID, individualUUID) => {
     try{ 
         return await conceptService.findConcept(conceptName).then(function (data) {
-            console.log(data);
             return true;
         });
     }catch(error){

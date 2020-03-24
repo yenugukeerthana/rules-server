@@ -6,7 +6,7 @@ class BaseService {
     }
 
     async findAllByKey(keyName, value, schemaName) {
-        return await this.findAllByCriteria(`${keyName}="${value}"`, schemaName);
+        return await this.findAllByCriteria(`${keyName}='${value}'`, schemaName);
     }
 
     async findAllByCriteria(filterCriteria, schema) {
@@ -19,7 +19,6 @@ class BaseService {
 
     async findByKey(keyName, value, schemaName = this.getSchema()) {
         const entities = await this.findAllByKey(keyName, value, schemaName);
-        console.log(`====> ${JSON.stringify(entities)}`)
         return this.getReturnValue(entities);
     }
 
