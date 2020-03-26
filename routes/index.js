@@ -3,5 +3,6 @@ var router = express.Router();
 
 var programEncounterController = require('../src/controllers/programEncounterController');
 
-router.get('/api/rules', programEncounterController.generateRules);
+router.post('/api/rules', programEncounterController.generateRules);
+
 module.exports = router;

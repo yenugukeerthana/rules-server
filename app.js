@@ -4,10 +4,13 @@ require("@babel/register")({
 require("@babel/polyfill");
 
 var express = require('express')
+var bodyParser = require('body-parser');
+
 var app = express()
 
 var index = require('./routes/index')
-
+app.use(bodyParser.urlencoded({ extended: true }));
+app.use(bodyParser.json());
 app.use('/', index)
 
 app.use(function (req, res, next) {

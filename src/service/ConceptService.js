@@ -11,16 +11,16 @@ class ConceptService extends BaseService{
         return concept;
     }
 
-    addRuleFailureTelemetric(ruleUUID, individualUUID,error){
+    addRuleFailureTelemetric(request,error){
         const req = {};
         req.uuid = uuidv4();
-        req.user_id = 3;
-        req.organisation_id = 2;
-        req.rule_uuid = ruleUUID;
-        req.individual_uuid = individualUUID;
+        req.user_id = request.userId;
+        req.organisation_id = request.organisarionId;
+        req.rule_uuid = request.ruleUuid;
+        req.individual_uuid = request.individualUuid;
         req.error_message = error.message;
         req.stacktrace = error.stack;
-        req.error_date_time = '2020-03-16 15:51:51.188+05:30';
+        req.error_date_time = new Date().toISOString();
         req.is_closed = 'FALSE';
         const sql = "insert into rule_failure_telemetry(uuid,user_id,organisation_id,rule_uuid,individual_uuid,error_message,stacktrace,error_date_time,is_closed) values (${uuid},${user_id},${organisation_id},${rule_uuid},${individual_uuid},${error_message},${stacktrace},${error_date_time},${is_closed})";
         this.db.none(sql,req);
