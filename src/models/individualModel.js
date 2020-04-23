@@ -3,18 +3,38 @@ import {
   ModelGeneral as General,
   Observation,
   Concept,
-  ConceptAnswer
+  ConceptAnswer,
+  Gender,
+  AddressLevel,
+  SubjectType
 } from "openchs-models";
 
-// subject Dashboard common functionality
 export const mapIndividual = individualDetails => {
-  return General.assignFields(
+  const individual = General.assignFields(
     individualDetails,
     new Individual(),
-    ["uuid", "firstName", "lastName", "dateOfBirth", "gender", "lowestAddressLevel"],
+    ["uuid", "firstName", "lastName", "dateOfBirth"],
     ["registrationDate"]
   );
+  const gender = new Gender();
+  gender.name = individualDetails.gender;
+  gender.uuid = individualDetails.genderUUID;
+  individual.gender = gender;
+
+  const subjectType = new SubjectType();
+  subjectType.uuid = individualDetails.subjectType.uuid;
+  subjectType.name = individualDetails.subjectType.name;
+  individual.subjectType = subjectType;
+
+  // const addressLevel = new AddressLevel();
+  // addressLevel.uuid = individualDetails.addressLevelUUID;
+  // addressLevel.name = individualDetails.addressLevel;
+  // individual.lowestAddressLevel = addressLevel;
+
+  return individual;
 };
+
+
 const mapObservation = (objservationList) => {
     if (objservationList)
         return objservationList.map(observation => {
@@ -22,18 +42,26 @@ const mapObservation = (objservationList) => {
         });
 };
 
-
 const mapConceptAnswer = (conceptAnswer) => {
   if (conceptAnswer) {
       let mapConceptAnswer = {};
       for (let [key, value] of Object.entries(conceptAnswer)) {
           let conceptAnswer = new ConceptAnswer();
-          conceptAnswer = mapConcept(value);
-          conceptAnswer.uuid = value.uuid
+          conceptAnswer = mapAnswerConceptObs(value);
           mapConceptAnswer[key] = conceptAnswer;
       }
       return mapConceptAnswer;
   }
+};
+
+const mapAnswerConceptObs = (observationJson) => {
+    if (observationJson) {
+        const observation = new Observation();
+        const concept = General.assignFields(observationJson, new Concept(), ["uuid", "name"]);
+        concept.datatype = observationJson["dataType"];
+          observation.concept = concept;
+          return observation;  
+    }
 };
 
 const mapConcept = (observationJson) => {
@@ -41,23 +69,12 @@ const mapConcept = (observationJson) => {
         const observation = new Observation();
         const concept = General.assignFields(observationJson.concept, new Concept(), ["uuid", "name"]);
         concept.datatype = observationJson.concept["dataType"];
-        if (observationJson.concept["answers"] !== undefined) {
+        if (observationJson.concept["answers"] != undefined) {
           concept.answers = mapConceptAnswer(observationJson.concept["answers"]);
         }
-        let value;
-        if (Array.isArray(observationJson.value) && concept.datatype === "Coded") {
-            value = [];
-            observationJson.value.forEach(observation => {
-                value.push(concept.getValueWrapperFor(observation.uuid));
-            });
-          } else if (concept.datatype === "Coded") {
-            value = concept.getValueWrapperFor(observationJson.value.uuid);
-          } else {
-            value = observationJson.value;
-          }
-          observation.concept = concept;
-          observation.valueJSON = value;
-          return observation;  
+        observation.concept = concept;
+        observation.valueJSON = JSON.stringify(concept.getValueWrapperFor(observationJson.value));
+        return observation;  
     }
 };
 
