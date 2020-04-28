@@ -1,7 +1,7 @@
 import rulesService from '../service/RulesService';
 import {programEnrolment} from '../RuleExecutor';
 
-const generateRules = (req, res, next) => {
+const decisionRules = (req, res, next) => {
   rulesService.findRulesById(req.body, res, next) 
     .then(async function (data) {
         const rulevalidated = await programEnrolment(JSON.parse(JSON.stringify(data))[0].rules,req.body);
@@ -17,5 +17,5 @@ const generateRules = (req, res, next) => {
 }
 
 module.exports = {
-  generateRules: generateRules
+    decisionRules: decisionRules
 };
