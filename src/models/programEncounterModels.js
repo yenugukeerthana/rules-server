@@ -15,41 +15,41 @@ const mapObservation = (objservationList) => {
 };
 
 const mapConceptAnswer = (conceptAnswer) => {
-    if (conceptAnswer) {
-        let mapConceptAnswer = {};
-        for (let [key, value] of Object.entries(conceptAnswer)) {
-            let conceptAnswer = new ConceptAnswer();
-            conceptAnswer = mapConcept(value);
-            conceptAnswer.uuid = value.uuid
-            mapConceptAnswer[key] = conceptAnswer;
-        }
-        return mapConceptAnswer;
+  if (conceptAnswer) {
+      let mapConceptAnswer = {};
+      for (let [key, value] of Object.entries(conceptAnswer)) {
+          let conceptAnswer = new ConceptAnswer();
+          conceptAnswer = mapAnswerConceptObs(value);
+          mapConceptAnswer[key] = conceptAnswer;
+      }
+      return mapConceptAnswer;
+  }
+};
+
+const mapAnswerConceptObs = (observationJson) => {
+    if (observationJson) {
+        const observation = new Observation();
+        const concept = General.assignFields(observationJson, new Concept(), ["uuid", "name"]);
+        concept.datatype = observationJson["dataType"];
+          observation.concept = concept;
+          return observation;  
     }
 };
 
 const mapConcept = (observationJson) => {
     if (observationJson) {
         const observation = new Observation();
-        const concept = General.assignFields(observationJson.concept, new Concept(), ["uuid", "name", "datatype"]);
-        if (observationJson.concept.answers["0"] !== undefined) {
-            concept.answers = mapConceptAnswer(observationJson.concept["answers"]);
-        }
-        let value;
-        if (Array.isArray(observationJson.value) && concept.datatype === "Coded") {
-            value = [];
-            observationJson.value.forEach(observation => {
-                value.push(concept.getValueWrapperFor(observationJson.valueJSON.answer));
-            });
-        } else if (concept.datatype === "Coded") {
-            value = concept.getValueWrapperFor(observationJson.valueJSON.answer);
-        } else {
-            value = observationJson.valueJSON;
+        const concept = General.assignFields(observationJson.concept, new Concept(), ["uuid", "name"]);
+        concept.datatype = observationJson.concept["dataType"];
+        if (observationJson.concept["answers"] != undefined) {
+          concept.answers = mapConceptAnswer(observationJson.concept["answers"]);
         }
         observation.concept = concept;
-        observation.valueJSON = value;
-        return observation;
+        observation.valueJSON = JSON.stringify(concept.getValueWrapperFor(observationJson.value));
+        return observation;  
     }
 };
+
 
 export const createEntity = (request) => {
     const entity = new ProgramEncounter();

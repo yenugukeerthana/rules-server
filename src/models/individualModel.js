@@ -26,10 +26,10 @@ export const mapIndividual = individualDetails => {
   subjectType.name = individualDetails.subjectType.name;
   individual.subjectType = subjectType;
 
-  // const addressLevel = new AddressLevel();
-  // addressLevel.uuid = individualDetails.addressLevelUUID;
-  // addressLevel.name = individualDetails.addressLevel;
-  // individual.lowestAddressLevel = addressLevel;
+  const addressLevel = new AddressLevel();
+  addressLevel.uuid = individualDetails.lowestAddressLevel.uuid;
+  addressLevel.name = individualDetails.lowestAddressLevel.name;
+  individual.lowestAddressLevel = addressLevel;
 
   return individual;
 };
