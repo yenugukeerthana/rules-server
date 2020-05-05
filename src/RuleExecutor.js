@@ -1,10 +1,15 @@
-import {createEntity} from './models/programEncounterModels';
+import {createEntity} from './models/programEncounterModel';
+import {mapEncounter} from './models/encounterModel';
 import { mapProfile } from './models/individualModel';
-import { mapProgramEnrolment } from './models/programEnrolmentModels';
+import { mapProgramEnrolment } from './models/programEnrolmentModel';
 import {decisionRule} from './ruleEvaluation/decisionRule';
 
-export const programEnocunter = async (rule,request) => {
+export const programEncounter = async (rule,request) => {
     return decisionRule(rule,createEntity(request));
+}
+
+export const encounter = async (rule,request) => {
+    return decisionRule(rule,mapEncounter(request));
 }
 
 export const individualRegistration = async (rule,request) => {
