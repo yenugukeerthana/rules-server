@@ -11,6 +11,7 @@ export const mapProgramEnrolment = (request) => {
     programEnrolment.programExitDateTime = request.programExitDateTime;
     programEnrolment.voided = request.voided;
     programEnrolment.observations = mapObservation(request.observations);
+    programEnrolment.programExitObservations = mapObservation(request.exitObservations);
     programEnrolment.individual = mapProfile(request.subject);
     return programEnrolment;
 }

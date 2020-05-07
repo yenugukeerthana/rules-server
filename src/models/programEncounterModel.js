@@ -13,7 +13,12 @@ export const createEntity = (request) => {
     entity.maxVisitDateTime = request.maxVisitDateTime;
     entity.encounterDateTime = request.encounterDateTime;
     entity.programEnrolment = null;
-    entity.observations = mapObservation(request.observations);
+    if(request.observations != undefined){
+        entity.observations = mapObservation(request.observations);
+    }
+    if(request.cancelObservations != undefined){
+        entity.cancelObservations = mapObservation(request.cancelObservations);
+    }
     return entity;
 }
 
