@@ -3,6 +3,7 @@ import {
     EncounterType,
 } from "openchs-models";
 import { mapObservation } from "./observationModel";
+import { mapProgramEnrolment } from "./programEnrolmentModel";
 
 export const createEntity = (request) => {
     const entity = new ProgramEncounter();
@@ -18,6 +19,9 @@ export const createEntity = (request) => {
     }
     if(request.cancelObservations != undefined){
         entity.cancelObservations = mapObservation(request.cancelObservations);
+    }
+    if(request.programEnrolment != undefined){
+        entity.programEnrolment = mapProgramEnrolment(request.programEnrolment);
     }
     return entity;
 }

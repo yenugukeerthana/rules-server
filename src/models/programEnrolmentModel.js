@@ -10,8 +10,14 @@ export const mapProgramEnrolment = (request) => {
     programEnrolment.enrolmentDateTime = request.enrolmentDateTime;
     programEnrolment.programExitDateTime = request.programExitDateTime;
     programEnrolment.voided = request.voided;
-    programEnrolment.observations = mapObservation(request.observations);
-    programEnrolment.programExitObservations = mapObservation(request.exitObservations);
-    programEnrolment.individual = mapProfile(request.subject);
+    if(request.observations != undefined){
+        programEnrolment.observations = mapObservation(request.observations);
+    }
+    if(request.exitObservations != undefined){
+        programEnrolment.programExitObservations = mapObservation(request.exitObservations);
+    }
+    if(request.subject != undefined){    
+        programEnrolment.individual = mapProfile(request.subject);
+    }
     return programEnrolment;
 }

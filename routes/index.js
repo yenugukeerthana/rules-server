@@ -7,12 +7,16 @@ var programEnrolmentController = require('../src/controllers/programEnrolmentCon
 var encounterController = require('../src/controllers/encounterController');
 
 
-router.post('/api/program_encounter_rule', programEncounterController.generateRules);
+router.post('/api/decision_program_encounter_rule', programEncounterController.generateRules);
 
-router.post('/api/encounter_rule', encounterController.generateRules);
+router.post('/api/decision_encounter_rule', encounterController.generateRules);
 
-router.post('/api/individual_rule', individualController.decisionRules);
+router.post('/api/decision_individual_rule', individualController.decisionRules);
 
-router.post('/api/program_enrolment_rule',programEnrolmentController.decisionRules);
+router.post('/api/decision_program_enrolment_rule',programEnrolmentController.decisionRules);
+
+router.post('/api/visitschedule_program_enrolment_rule',programEnrolmentController.visitScheduleRules);
+
+router.post('/api/visitschedule_encounter_rule',encounterController.visitScheduleRules);
 
 module.exports = router;

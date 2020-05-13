@@ -15,3 +15,12 @@ export const decisionRule = async (rule,entity) => {
     });
     return ruleDecisions;
 }
+
+export const visitScheduleRule = async (rule,entity,scheduledVisits) => {
+    const ruleFunc = eval(rule);
+    const nextVisits = ruleFunc({
+        params: { visitSchedule: scheduledVisits, entity },
+        imports: { rulesConfig, lodash, moment }
+    });
+    return nextVisits;
+}
