@@ -1,22 +1,21 @@
-import lodash from 'lodash';
-import moment from 'moment';
-import * as rulesConfig from 'rules-config';
-import {validateDecisions, trimDecisionsMap} from './service/RuleEvaluationService';
-import {createEntity} from './models/programEncounterModels';
+import {createEntity} from './models/programEncounterModel';
+import {mapEncounter} from './models/encounterModel';
+import { mapProfile } from './models/individualModel';
+import { mapProgramEnrolment } from './models/programEnrolmentModel';
+import {decisionRule} from './ruleEvaluation/decisionRule';
 
-export const programEnocunter = async (rule,request) => {
-    const defaultDecisions = {
-        "enrolmentDecisions": [],
-        "encounterDecisions": [],
-        "registrationDecisions": []
-    };
-    const ruleFunc = eval(rule);
-    const entity = createEntity(request);
-    const ruleDecisions = ruleFunc({
-        params: {decisions: defaultDecisions, entity},
-        imports: {rulesConfig, lodash, moment}
-    });
-    const decisionsMap = await validateDecisions(ruleDecisions, request);
-    const trimmedDecisions = await trimDecisionsMap(decisionsMap);
-    return trimmedDecisions;
+export const programEncounter = async (rule,request) => {
+    return decisionRule(rule,createEntity(request));
+}
+
+export const encounter = async (rule,request) => {
+    return decisionRule(rule,mapEncounter(request));
+}
+
+export const individualRegistration = async (rule,request) => {
+    return decisionRule(rule,mapProfile(request));
+}
+
+export const programEnrolment = async (rule,request) => {
+    return decisionRule(rule,mapProgramEnrolment(request));
 }
