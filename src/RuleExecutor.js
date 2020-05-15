@@ -5,15 +5,18 @@ import { mapProgramEnrolment } from './models/programEnrolmentModel';
 import {decisionRule,visitScheduleRule} from './ruleEvaluation/decisionRule';
 
 export const programEncounter = async (rule,request) => {
-    return decisionRule(rule,createEntity(request));
+    switch(request.rule.ruleType){
+        case 'Decision' : return decisionRule(rule,createEntity(request));
+        case 'VisitSchedule' : 
+                let data = visitScheduleRule(rule,createEntity(request),request.visitSchedules);
+                return [...await data, ... request.visitSchedules];
+    }
 }
 
 export const encounter = async (rule,request) => {
     switch(request.rule.ruleType){
         case 'Decision' : return decisionRule(rule,mapEncounter(request));
-        case 'VisitSchedule' :
-                            const scheduleVisit = []; 
-                            return visitScheduleRule(rule,mapEncounter(request),scheduleVisit);
+        case 'VisitSchedule' : return visitScheduleRule(rule,mapEncounter(request),request.visitSchedules);
     }
     
 }
@@ -25,9 +28,9 @@ export const individualRegistration = async (rule,request) => {
 export const programEnrolment = async (rule,request) => {
     switch(request.rule.ruleType){
         case 'Decision' : return decisionRule(rule,mapProgramEnrolment(request));
-        case 'VisitSchedule' :
-                            const scheduleVisit = []; 
-                            return visitScheduleRule(rule,mapProgramEnrolment(request),scheduleVisit);
+        case 'VisitSchedule' : 
+                let data = visitScheduleRule(rule,mapProgramEnrolment(request),request.visitSchedules);
+                return [...await data, ... request.visitSchedules];
     }
 }
 
