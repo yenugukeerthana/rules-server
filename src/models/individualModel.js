@@ -11,12 +11,12 @@ export const mapIndividual = individualDetails => {
   const individual = General.assignFields(
     individualDetails,
     new Individual(),
-    ["uuid", "firstName", "lastName", "dateOfBirth"],
-    ["registrationDate"]
+    ["uuid", "firstName", "lastName"],
+    ["registrationDate","dateOfBirth"]
   );
   const gender = new Gender();
-  gender.name = individualDetails.gender;
-  gender.uuid = individualDetails.genderUUID;
+  gender.name = individualDetails.gender.name;
+  gender.uuid = individualDetails.gender.uuid;
   individual.gender = gender;
 
   const subjectType = new SubjectType();
