@@ -17,7 +17,8 @@ router.post('/api/decision_program_enrolment_rule',programEnrolmentController.de
 
 router.post('/api/visitschedule_program_enrolment_rule',programEnrolmentController.visitScheduleRules);
 
-router.post('/api/visitschedule_encounter_rule',encounterController.visitScheduleRules);
+/** Encounter VisitSchedule , Not in scope of 2nd Release*/
+// router.post('/api/visitschedule_encounter_rule',encounterController.visitScheduleRules);
 
 router.post('/api/visitschedule_program_encounter_rule',programEncounterController.visitScheduleRules);
 

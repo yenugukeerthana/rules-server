@@ -3,6 +3,7 @@ import {
 } from "openchs-models";
 import {mapObservation} from "./observationModel";
 import { mapProfile } from "./individualModel";
+import { createEntity } from "./programEncounterModel";
 
 export const mapProgramEnrolment = (request) => {
     const programEnrolment = new ProgramEnrolment();
@@ -18,6 +19,9 @@ export const mapProgramEnrolment = (request) => {
     }
     if(request.subject != undefined){    
         programEnrolment.individual = mapProfile(request.subject);
+    }
+    if(request.programEncounters != undefined){
+        programEnrolment.encounters = request.programEncounters.map(programEncounter => createEntity(programEncounter));
     }
     return programEnrolment;
 }
