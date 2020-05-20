@@ -6,8 +6,8 @@ import {decisionRule,visitScheduleRule} from './ruleEvaluation/decisionRule';
 
 const convertDateTomilliseconds = (visitSchedules) => {
     visitSchedules.forEach((visitSchedule, index, array) => {
-        array[index].maxDate = new Date(visitSchedule.maxDate).getTime();
-        array[index].earliestDate = new Date(visitSchedule.earliestDate).getTime();
+        array[index].maxDate = visitSchedule.maxDate ? new Date(visitSchedule.maxDate).getTime(): null;
+        array[index].earliestDate = visitSchedule.earliestDate ? new Date(visitSchedule.earliestDate).getTime():null;
     });
     return visitSchedules;
 }
