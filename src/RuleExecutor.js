@@ -6,8 +6,8 @@ import {decisionRule,visitScheduleRule} from './ruleEvaluation/decisionRule';
 
 const convertDateTomilliseconds = (visitSchedules) => {
     visitSchedules.forEach((visitSchedule, index, array) => {
-        array[index].maxDate = new Date(visitSchedule.maxDate).getTime();
-        array[index].earliestDate = new Date(visitSchedule.earliestDate).getTime();
+        array[index].maxDate = visitSchedule.maxDate ? new Date(visitSchedule.maxDate).getTime(): null;
+        array[index].earliestDate = visitSchedule.earliestDate ? new Date(visitSchedule.earliestDate).getTime():null;
     });
     return visitSchedules;
 }
@@ -22,7 +22,7 @@ export const programEncounter = async (rule,request) => {
 export const encounter = async (rule,request) => {
     switch(request.rule.ruleType){
         case 'Decision' : return decisionRule(rule,mapEncounter(request));
-        case 'VisitSchedule' : return visitScheduleRule(rule,mapEncounter(request),request.visitSchedules);
+        case 'VisitSchedule' : return convertDateTomilliseconds(await visitScheduleRule(rule,mapEncounter(request),request.visitSchedules));
     }
     
 }
