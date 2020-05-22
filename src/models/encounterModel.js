@@ -21,12 +21,14 @@ export const mapEncounter = (request) => {
     if(request.cancelObservations != undefined){
         encounter.cancelObservations = mapObservation(request.cancelObservations);
     }
-    encounter.individual = mapIndividual(request.subject);
-    if(request.subject.enrolments != undefined){
-        encounter.individual.enrolments = mapProgramEnrolment(request.subject.enrolments);
-    }
-    if(request.subject.encounters != undefined){
-        encounter.individual.encounters = mapEncounters(request.subject.encounters);
+    if(request.subject != undefined){
+        encounter.individual = mapIndividual(request.subject);
+        if(request.subject.enrolments != undefined){
+            encounter.individual.enrolments = mapProgramEnrolment(request.subject.enrolments);
+        }
+        if(request.subject.encounters != undefined){
+            encounter.individual.encounters = mapEncounters(request.subject.encounters);
+        }
     }
     return encounter;
 }

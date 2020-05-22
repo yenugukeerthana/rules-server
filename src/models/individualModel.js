@@ -6,6 +6,7 @@ import {
   SubjectType
 } from "openchs-models";
 import { mapObservation } from "./observationModel";
+import { mapEncounter } from "./encounterModel";
 
 export const mapIndividual = individualDetails => {
   const individual = General.assignFields(
@@ -37,6 +38,11 @@ export const mapProfile = subjectProfile => {
   if (subjectProfile) {
     let individual = mapIndividual(subjectProfile);
     individual.observations = mapObservation(subjectProfile["observations"]);
+    if(subjectProfile["encounters"] != undefined){
+      individual.encounters = subjectProfile["encounters"].map(encounters => {
+        return mapEncounter(encounters);
+      });
+    }
     return individual;
   }
 };
