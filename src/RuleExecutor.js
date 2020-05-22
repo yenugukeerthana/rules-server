@@ -28,7 +28,12 @@ export const encounter = async (rule,request) => {
 }
 
 export const individualRegistration = async (rule,request) => {
-    return decisionRule(rule,mapProfile(request));
+    console.log(JSON.stringify(request));
+    switch(request.rule.ruleType){
+        case 'Decision' : return decisionRule(rule,mapProfile(request));
+        case 'VisitSchedule' : return convertDateTomilliseconds(await visitScheduleRule(rule,mapProfile(request)));
+    }
+
 }
 
 export const programEnrolment = async (rule,request) => {
