@@ -2,7 +2,7 @@ import {createEntity} from './models/programEncounterModel';
 import {mapEncounter} from './models/encounterModel';
 import { mapProfile } from './models/individualModel';
 import { mapProgramEnrolment } from './models/programEnrolmentModel';
-import {decisionRule,visitScheduleRule} from './ruleEvaluation/decisionRule';
+import {decisionRule,visitScheduleRule,checkListRule} from './ruleEvaluation/decisionRule';
 
 const convertDateTomilliseconds = (visitSchedules) => {
     visitSchedules.forEach((visitSchedule, index, array) => {
@@ -35,6 +35,7 @@ export const programEnrolment = async (rule,request) => {
     switch(request.rule.ruleType){
         case 'Decision' : return decisionRule(rule,mapProgramEnrolment(request));
         case 'VisitSchedule' : return convertDateTomilliseconds(await visitScheduleRule(rule,mapProgramEnrolment(request),request.visitSchedules));
+        case 'CheckList' : return checkListRule(rule,mapProgramEnrolment(request));
     }
 }
 

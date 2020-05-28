@@ -9,7 +9,8 @@ class RulesService extends BaseService{
                                  break;
                 case 'VisitSchedule': ruleQuery = 'select visit_schedule_rule as rules from form where uuid = $1';
                                  break;
-
+                case 'CheckList' : ruleQuery = 'select checklists_rule as rules from form where uuid = $1';
+                                 break;
             }
         }
         return this.db.any(ruleQuery, [req.rule.formUuid])

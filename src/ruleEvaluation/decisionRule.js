@@ -24,3 +24,14 @@ export const visitScheduleRule = async (rule,entity,scheduledVisits) => {
     });
     return nextVisits;
 }
+
+export const checkListRule = async (rule,entity) => {
+    const allChecklistDetails = JSON.parse('[{"uuid":"123-3454-56756-789","name":"Vaccination","items":[{"uuid":"123-456-789-5456"}]}]');
+    const ruleFunc = eval(rule);
+    const nextVisits = ruleFunc({
+        params: { checklistDetails: allChecklistDetails, entity },
+        imports: { rulesConfig, lodash, moment }
+    });
+    console.log(JSON.stringify(nextVisits));
+    return nextVisits;
+}
