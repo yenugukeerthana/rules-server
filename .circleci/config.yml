@@ -26,11 +26,11 @@ commands:
           name: Deploy server
           command: |
             ssh -o StrictHostKeyChecking=no ec2-user@<< parameters.hostname >> \
-            sudo rm -rf /opt/rules-server
-            sudo unzip /tmp/rules-server.zip -d /opt/
-            cd /opt/rules-server
-            pm2 stop rules-server
-            pm2 start app.js --name rules-server
+            sudo rm -rf /opt/rules-server \
+            sudo unzip /tmp/rules-server.zip -d /opt/ \
+            cd /opt/rules-server \
+            pm2 stop rules-server \
+            pm2 start app.js --name rules-server \
             sudo rm -rf /tmp/rules-server.zip
 
 jobs:
