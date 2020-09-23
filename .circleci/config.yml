@@ -16,7 +16,7 @@ commands:
             sudo apt-get -y -qq update
             sudo apt-get -y -qq install make openssl python3-pip
             sudo pip3 install awscli --upgrade
-            
+
       - run:
           name: Copy artifacts to server
           command: |
@@ -25,7 +25,7 @@ commands:
       - run:
           name: Deploy server
           command: |
-            ssh -o StrictHostKeyChecking=no \
+            ssh -o StrictHostKeyChecking=no ec2-user@<< parameters.hostname >> \
             sudo rm -rf /opt/rules-server
             sudo unzip /tmp/rules-server.zip -d /opt/
             cd /opt/rules-server
