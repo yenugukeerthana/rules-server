@@ -23,4 +23,5 @@ router.post('/api/visitschedule_program_encounter_rule',programEncounterControll
 
 router.post('/api/visitschedule_individual_rule',individualController.visitScheduleRules);
 
+router.post('/api/checklist_program_enrolment_rule',programEnrolmentController.checkListRules);
 module.exports = router;
