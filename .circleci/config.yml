@@ -88,7 +88,7 @@ jobs:
     working_directory: ~/
     steps:
       - deploy:
-          to: "ssh.staging.openchs.org"
+          hostname: "ssh.staging.openchs.org"
 
   PRODUCTION_deploy:
     docker:
@@ -96,7 +96,7 @@ jobs:
     working_directory: ~/
     steps:
       - deploy:
-          to: "ssh.server.openchs.org"
+          hostname: "ssh.server.openchs.org"
 
 workflows:
   version: 2
