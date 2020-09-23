@@ -25,7 +25,7 @@ commands:
       - run:
           name: Deploy server
           command: |
-            ssh -o StrictHostKeyChecking=no ec2-user@<< parameters.hostname >> << EOF
+            ssh -o StrictHostKeyChecking=no ec2-user@<< parameters.hostname >> \<< EOF
             sudo rm -rf /opt/rules-server
             sudo unzip /tmp/rules-server.zip -d /opt/
             cd /opt/rules-server
