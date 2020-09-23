@@ -11,12 +11,20 @@ commands:
           at: ~/artifacts
 
       - run:
-          name: Install dependencies
+          name: Install dependencies and deploy to server
           command: |
             sudo apt-get -y -qq update
             sudo apt-get -y -qq install make openssl python3-pip
             sudo pip3 install awscli --upgrade
+            
+      - run:
+          name: Copy artifacts to server
+          command: |
             scp -o StrictHostKeyChecking=no ~/artifacts/rules-server.zip ec2-user@<< parameters.hostname >>:/tmp
+
+      - run:
+          name: Deploy server
+          command: |
             ssh -o StrictHostKeyChecking=no \
             sudo rm -rf /opt/rules-server
             sudo unzip /tmp/rules-server.zip -d /opt/
@@ -78,6 +86,7 @@ jobs:
           root: ~/artifacts
           paths:
             - build_version
+            - rules-server.zip
 
       - store_artifacts:
           path: ~/artifacts
