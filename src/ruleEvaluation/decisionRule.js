@@ -32,6 +32,5 @@ export const checkListRule = async (rule,entity) => {
         params: { checklistDetails: allChecklistDetails, entity },
         imports: { rulesConfig, lodash, moment }
     });
-    console.log(JSON.stringify(nextVisits));
     return nextVisits;
 }

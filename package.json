@@ -30,7 +30,7 @@
     "openchs-models": "0.2.10"
   },
   "scripts": {
-    "start": "nodemon app.js",
+    "start": "nodemon $NODE_DEBUG_OPTION app.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "",
