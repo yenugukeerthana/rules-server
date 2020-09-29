@@ -32,7 +32,8 @@
     "openchs-models": "0.2.10"
   },
   "scripts": {
-    "start": "nodemon $NODE_DEBUG_OPTION app.js",
+    "start": "nodemon app.js",
+    "debug": "nodemon $NODE_DEBUG_OPTION app.js",
     "test": "jest"
   },
   "author": "",
