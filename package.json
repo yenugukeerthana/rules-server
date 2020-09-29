@@ -14,6 +14,7 @@
     "openchs-models": "0.2.10",
     "pg-promise": "^5.3.5",
     "rules-config": "github:openchs/rules-config#08202533ec3f3a55977946c69d204f3df8080e61",
+    "safe-eval": "^0.4.1",
     "uuid": "^7.0.2"
   },
   "devDependencies": {
@@ -26,12 +27,13 @@
     "@babel/register": "7.4.4",
     "@babel/runtime": "7.4.4",
     "babel-plugin-transform-class-properties": "6.24.1",
+    "jest": "^26.4.2",
     "nodemon": "^2.0.2",
     "openchs-models": "0.2.10"
   },
   "scripts": {
     "start": "nodemon $NODE_DEBUG_OPTION app.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "jest"
   },
   "author": "",
   "license": "ISC"
