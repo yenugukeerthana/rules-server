@@ -29,8 +29,8 @@ commands:
             sudo rm -rf /opt/rules-server
             sudo unzip /tmp/rules-server.zip -d /opt/
             cd /opt/rules-server
-            sudo env PATH=/home/ec2-user/.nvm/versions/node/v10.15.0/bin pm2 stop rules-server
-            sudo env PATH=/home/ec2-user/.nvm/versions/node/v10.15.0/bin pm2 start app.js --name rules-server
+            chmod a+x /opt/rules-server/deploy/install.sh
+            sudo ./deploy/install.sh
             sudo rm -rf /tmp/rules-server.zip
             EOF
 
