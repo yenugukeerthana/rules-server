@@ -53,8 +53,8 @@ jobs:
           key: dependency-cache-{{ checksum "package.json" }}
           paths:
             - ./node_modules
-      # no tests right now commenting this
-      #- run: yarn test
+
+      - run: yarn test
 
   app_build:
     docker:
@@ -130,6 +130,6 @@ workflows:
           requires:
             - PRODUCTION_approve
 
-#notify:
-#  webhooks:
-#    - url: https://webhooks.gitter.im/e/0fdffde721194986f2a0
+notify:
+  webhooks:
+    - url: https://webhooks.gitter.im/e/0fdffde721194986f2a0

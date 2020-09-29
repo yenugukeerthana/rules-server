@@ -16,5 +16,7 @@ if [ $? -eq 1 ]; then
 fi
 
 chown -R rules:rules /opt/rules-server
+chgrp -R rules /opt/rules-server
+chmod -R 770 /opt/rules-server
 cd /opt/rules-server
 sudo -H -u rules bash -c "PM2_HOME=/etc/pm2deamon pm2 stop rules-server && PM2_HOME=/etc/pm2deamon pm2 start app.js --name rules-server"
