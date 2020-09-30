@@ -1,9 +1,9 @@
 import {
     ProgramEnrolment,
 } from "openchs-models";
-import {mapObservation} from "./observationModel";
+import {mapObservations} from "./observationModel";
 import { mapProfile } from "./individualModel";
-import { createEntity } from "./programEncounterModel";
+import { mapProgramEncounter } from "./programEncounterModel";
 
 export const mapProgramEnrolment = (request) => {
     const programEnrolment = new ProgramEnrolment();
@@ -14,17 +14,17 @@ export const mapProgramEnrolment = (request) => {
     console.log(`programEnrolmentModel: trying to set observations`);
     if(request.observations != undefined){
         // console.log(`programEnrolmentModel: obs ${JSON.stringify(request.observations)}`);
-        programEnrolment.observations = mapObservation(request.observations);
+        programEnrolment.observations = mapObservations(request.observations);
       console.log(`programEnrolmentModel: modal ${JSON.stringify(programEnrolment.observations)}`);
     }
     if(request.exitObservations != undefined){
-        programEnrolment.programExitObservations = mapObservation(request.exitObservations);
+        programEnrolment.programExitObservations = mapObservations(request.exitObservations);
     }
     if(request.subject != undefined){    
         programEnrolment.individual = mapProfile(request.subject);
     }
     if(request.programEncounters != undefined){
-        programEnrolment.encounters = request.programEncounters.map(programEncounter => createEntity(programEncounter));
+        programEnrolment.encounters = request.programEncounters.map(programEncounter => mapProgramEncounter(programEncounter));
     }
     return programEnrolment;
 }

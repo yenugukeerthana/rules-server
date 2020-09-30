@@ -1,4 +1,4 @@
-import {createEntity} from './models/programEncounterModel';
+import {mapProgramEncounter} from './models/programEncounterModel';
 import {mapEncounter} from './models/encounterModel';
 import { mapProfile } from './models/individualModel';
 import { mapProgramEnrolment } from './models/programEnrolmentModel';
@@ -14,8 +14,8 @@ const convertDateTomilliseconds = (visitSchedules) => {
 
 export const programEncounter = async (rule,request) => {
     switch(request.rule.ruleType){
-        case 'Decision' : return decisionRule(rule,createEntity(request));
-        case 'VisitSchedule' : return convertDateTomilliseconds(await visitScheduleRule(rule,createEntity(request),request.visitSchedules));
+        case 'Decision' : return decisionRule(rule,mapProgramEncounter(request));
+        case 'VisitSchedule' : return convertDateTomilliseconds(await visitScheduleRule(rule,mapProgramEncounter(request),request.visitSchedules));
     }
 }
 

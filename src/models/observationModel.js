@@ -5,10 +5,10 @@ import {
     ConceptAnswer
 } from "openchs-models";
 
-export const mapObservation = (objservationList) => {
+export const mapObservations = (objservationList) => {
     if (objservationList)
         return objservationList.map(observation => {
-            return mapConcept(observation);
+            return mapObservation(observation);
         });
 };
 
@@ -34,7 +34,7 @@ const mapAnswerConceptObs = (observationJson) => {
     }
 };
 
-const mapConcept = (observationJson) => {
+const mapObservation = (observationJson) => {
     if (observationJson) {
         const observation = new Observation();
         const concept = General.assignFields(observationJson.concept, new Concept(), ["uuid", "name"]);

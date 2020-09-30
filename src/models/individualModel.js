@@ -5,7 +5,7 @@ import {
   AddressLevel,
   SubjectType
 } from "openchs-models";
-import { mapObservation } from "./observationModel";
+import { mapObservations } from "./observationModel";
 import { mapEncounter } from "./encounterModel";
 
 export const mapIndividual = individualDetails => {
@@ -37,7 +37,7 @@ export const mapIndividual = individualDetails => {
 export const mapProfile = subjectProfile => {
   if (subjectProfile) {
     let individual = mapIndividual(subjectProfile);
-    individual.observations = mapObservation(subjectProfile["observations"]);
+    individual.observations = mapObservations(subjectProfile["observations"]);
     if(subjectProfile["encounters"] != undefined){
       individual.encounters = subjectProfile["encounters"].map(encounters => {
         return mapEncounter(encounters);

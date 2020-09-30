@@ -3,7 +3,7 @@ import {
     ModelGeneral as General,
     EncounterType,
 } from "openchs-models";
-import { mapObservation } from "./observationModel";
+import { mapObservations } from "./observationModel";
 import ProgramEnrolment from "openchs-models/dist/ProgramEnrolment";
 import {mapIndividual} from "./individualModel";
 
@@ -16,10 +16,10 @@ export const mapEncounter = (request) => {
       );
     encounter.encounterType = createEncounterType(request.encounterType);
     if(request.observations != undefined){
-        encounter.observations = mapObservation(request.observations);
+        encounter.observations = mapObservations(request.observations);
     }
     if(request.cancelObservations != undefined){
-        encounter.cancelObservations = mapObservation(request.cancelObservations);
+        encounter.cancelObservations = mapObservations(request.cancelObservations);
     }
     if(request.subject != undefined){
         encounter.individual = mapIndividual(request.subject);
