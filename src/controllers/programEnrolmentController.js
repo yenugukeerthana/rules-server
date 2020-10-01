@@ -1,4 +1,5 @@
 import {programEnrolment} from '../RuleExecutor';
+import {buildFailureResponse} from "./Common";
 
 const decisionRules = async (req, res, next) => {
     try {
@@ -9,7 +10,7 @@ const decisionRules = async (req, res, next) => {
                 data: rulevalidated
             });
     } catch (err) {
-        return next(err);
+        buildFailureResponse(res, err);
     }
 }
 
@@ -22,7 +23,7 @@ const visitScheduleRules = async (req, res, next) => {
         visitSchedules: rulevalidated
       });
   } catch (err) {
-    return next(err);
+      buildFailureResponse(res, err);
   }
 }
 
@@ -35,7 +36,7 @@ const checkListRules = async (req, res, next) => {
                 visitSchedules: rulevalidated
             });
     } catch (err) {
-        return next(err);
+        buildFailureResponse(res, err);
     }
 }
 

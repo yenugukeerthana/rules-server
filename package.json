@@ -14,7 +14,7 @@
     "moment": "^2.22.2",
     "openchs-models": "0.2.10",
     "pg-promise": "^5.3.5",
-    "rules-config": "github:openchs/rules-config#08202533ec3f3a55977946c69d204f3df8080e61",
+    "rules-config": "github:openchs/rules-config#db9d68448cbc6c9122ca2aa03eb42c64f590d02c",
     "safe-eval": "^0.4.1",
     "uuid": "^7.0.2"
   },

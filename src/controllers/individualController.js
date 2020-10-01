@@ -1,4 +1,5 @@
 import {individualRegistration} from '../RuleExecutor';
+import {buildFailureResponse} from "./Common";
 
 const decisionRules = async (req, res, next) => {
     try {
@@ -9,12 +10,7 @@ const decisionRules = async (req, res, next) => {
                 data: rulevalidated
             });
     } catch (err) {
-        res.status(222)
-            .json({
-                status: 'failure',
-                message: err.message,
-                stack: err.stack
-            })
+        buildFailureResponse(res, err);
     }
 }
 
@@ -27,7 +23,7 @@ const visitScheduleRules = async (req, res, next) => {
         visitSchedules: rulevalidated
       });
   } catch (err) {
-    return next(err);
+      buildFailureResponse(res, err);
   }
 }
 
