@@ -7,9 +7,9 @@ var programEnrolmentController = require('../src/controllers/programEnrolmentCon
 var encounterController = require('../src/controllers/encounterController');
 
 
-router.post('/api/decision_program_encounter_rule', programEncounterController.generateRules);
+router.post('/api/decision_program_encounter_rule', programEncounterController.decisionRules);
 
-router.post('/api/decision_encounter_rule', encounterController.generateRules);
+router.post('/api/decision_encounter_rule', encounterController.decisionRules);
 
 router.post('/api/decision_individual_rule', individualController.decisionRules);
 
