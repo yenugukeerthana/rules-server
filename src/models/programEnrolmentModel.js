@@ -13,9 +13,7 @@ export const mapProgramEnrolment = (request) => {
     programEnrolment.voided = request.voided;
     console.log(`programEnrolmentModel: trying to set observations`);
     if(request.observations != undefined){
-        // console.log(`programEnrolmentModel: obs ${JSON.stringify(request.observations)}`);
         programEnrolment.observations = mapObservations(request.observations);
-      console.log(`programEnrolmentModel: modal ${JSON.stringify(programEnrolment.observations)}`);
     }
     if(request.exitObservations != undefined){
         programEnrolment.programExitObservations = mapObservations(request.exitObservations);
