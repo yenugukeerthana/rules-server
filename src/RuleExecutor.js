@@ -1,6 +1,6 @@
 import {mapProgramEncounter} from './models/programEncounterModel';
 import {mapEncounter} from './models/encounterModel';
-import { mapProfile } from './models/individualModel';
+import { mapIndividual } from './models/individualModel';
 import { mapProgramEnrolment } from './models/programEnrolmentModel';
 import {decisionRule,visitScheduleRule,checkListRule} from './ruleEvaluation/decisionRule';
 
@@ -29,8 +29,8 @@ export const encounter = async (rule,request) => {
 
 export const individualRegistration = async (rule,request) => {
     switch(request.rule.ruleType){
-        case 'Decision' : return decisionRule(rule,mapProfile(request));
-        case 'VisitSchedule' : return convertDateTomilliseconds(await visitScheduleRule(rule,mapProfile(request),request.visitSchedules));
+        case 'Decision' : return decisionRule(rule, mapIndividual(request));
+        case 'VisitSchedule' : return convertDateTomilliseconds(await visitScheduleRule(rule, mapIndividual(request),request.visitSchedules));
     }
 
 }

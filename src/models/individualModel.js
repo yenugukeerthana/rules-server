@@ -30,6 +30,8 @@ export const mapIndividual = individualDetails => {
   addressLevel.name = individualDetails.lowestAddressLevel.name;
   individual.lowestAddressLevel = addressLevel;
 
+  individual.observations = mapObservations(individualDetails["observations"]);
+
   return individual;
 };
 
@@ -37,7 +39,6 @@ export const mapIndividual = individualDetails => {
 export const mapProfile = subjectProfile => {
   if (subjectProfile) {
     let individual = mapIndividual(subjectProfile);
-    individual.observations = mapObservations(subjectProfile["observations"]);
     if(subjectProfile["encounters"] != undefined){
       individual.encounters = subjectProfile["encounters"].map(encounters => {
         return mapEncounter(encounters);

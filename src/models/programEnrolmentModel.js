@@ -2,7 +2,7 @@ import {
     ProgramEnrolment,
 } from "openchs-models";
 import {mapObservations} from "./observationModel";
-import { mapProfile } from "./individualModel";
+import { mapIndividual } from "./individualModel";
 import { mapProgramEncounter } from "./programEncounterModel";
 
 export const mapProgramEnrolment = (request) => {
@@ -18,8 +18,9 @@ export const mapProgramEnrolment = (request) => {
     if(request.exitObservations != undefined){
         programEnrolment.programExitObservations = mapObservations(request.exitObservations);
     }
-    if(request.subject != undefined){    
-        programEnrolment.individual = mapProfile(request.subject);
+    if(request.subject != undefined){
+        //TODO: add encounters and enrolments to individual
+        programEnrolment.individual = mapIndividual(request.subject);
     }
     if(request.programEncounters != undefined){
         programEnrolment.encounters = request.programEncounters.map(programEncounter => mapProgramEncounter(programEncounter));
