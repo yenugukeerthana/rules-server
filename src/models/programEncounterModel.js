@@ -14,7 +14,6 @@ export const mapProgramEncounter = (request) => {
     entity.maxVisitDateTime = request.maxVisitDateTime;
     entity.encounterDateTime = request.encounterDateTime;
     entity.programEnrolment = null;
-    console.log(`programEncounterModel: request.obs ${request.observations}`);
     if(request.observations != undefined){
         entity.observations = mapObservations(request.observations);
         console.log(`programEncounterModel: modal ${JSON.stringify(entity.observations)}`);
