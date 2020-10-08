@@ -14,7 +14,7 @@ const ruleServiceLibraryInterfaceForSharingModules = {
 
 const removeStrictFromRuleCode = (rule) => rule.replace(/"use strict";/ig, '');
 
-const context = {console, ruleServiceLibraryInterfaceForSharingModules};
+const context = {console, ruleServiceLibraryInterfaceForSharingModules, _: lodash};
 
 export const decisionRule = async (rule,entity) => {
     const defaultDecisions = {
