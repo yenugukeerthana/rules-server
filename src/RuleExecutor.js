@@ -4,7 +4,7 @@ import { mapIndividual } from './models/individualModel';
 import { mapProgramEnrolment } from './models/programEnrolmentModel';
 import {decisionRule,visitScheduleRule,checkListRule} from './ruleEvaluation/decisionRule';
 
-const convertDateTomilliseconds = (visitSchedules) => {
+const transformVisitScheduleDates = (visitSchedules) => {
     visitSchedules.forEach((visitSchedule, index, array) => {
         array[index].maxDate = visitSchedule.maxDate ? new Date(visitSchedule.maxDate).getTime(): null;
         array[index].earliestDate = visitSchedule.earliestDate ? new Date(visitSchedule.earliestDate).getTime():null;
@@ -12,34 +12,34 @@ const convertDateTomilliseconds = (visitSchedules) => {
     return visitSchedules;
 }
 
-export const programEncounter = async (rule,request) => {
+export const programEncounter = async (ruleCode,request) => {
     switch(request.rule.ruleType){
-        case 'Decision' : return decisionRule(rule,mapProgramEncounter(request));
-        case 'VisitSchedule' : return convertDateTomilliseconds(await visitScheduleRule(rule,mapProgramEncounter(request),request.visitSchedules));
+        case 'Decision' : return decisionRule(ruleCode,mapProgramEncounter(request));
+        case 'VisitSchedule' : return transformVisitScheduleDates(await visitScheduleRule(ruleCode,mapProgramEncounter(request),request.visitSchedules));
     }
 }
 
-export const encounter = async (rule,request) => {
+export const encounter = async (ruleCode,request) => {
     switch(request.rule.ruleType){
-        case 'Decision' : return decisionRule(rule,mapEncounter(request));
-        case 'VisitSchedule' : return convertDateTomilliseconds(await visitScheduleRule(rule,mapEncounter(request),request.visitSchedules));
+        case 'Decision' : return decisionRule(ruleCode,mapEncounter(request));
+        case 'VisitSchedule' : return transformVisitScheduleDates(await visitScheduleRule(ruleCode,mapEncounter(request),request.visitSchedules));
     }
     
 }
 
-export const individualRegistration = async (rule,request) => {
+export const individualRegistration = async (ruleCode,request) => {
     switch(request.rule.ruleType){
-        case 'Decision' : return decisionRule(rule, mapIndividual(request));
-        case 'VisitSchedule' : return convertDateTomilliseconds(await visitScheduleRule(rule, mapIndividual(request),request.visitSchedules));
+        case 'Decision' : return decisionRule(ruleCode, mapIndividual(request));
+        case 'VisitSchedule' : return transformVisitScheduleDates(await visitScheduleRule(ruleCode, mapIndividual(request),request.visitSchedules));
     }
 
 }
 
-export const programEnrolment = async (rule,request) => {
+export const programEnrolment = async (ruleCode,request) => {
     switch(request.rule.ruleType){
-        case 'Decision' : return decisionRule(rule,mapProgramEnrolment(request));
-        case 'VisitSchedule' : return convertDateTomilliseconds(await visitScheduleRule(rule,mapProgramEnrolment(request),request.visitSchedules));
-        case 'CheckList' : return checkListRule(rule,mapProgramEnrolment(request));
+        case 'Decision' : return decisionRule(ruleCode,mapProgramEnrolment(request));
+        case 'VisitSchedule' : return transformVisitScheduleDates(await visitScheduleRule(ruleCode,mapProgramEnrolment(request),request.visitSchedules));
+        case 'CheckList' : return checkListRule(ruleCode,mapProgramEnrolment(request));
     }
 }
 

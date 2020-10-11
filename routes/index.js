@@ -1,3 +1,5 @@
+import {rulesController} from "../src/controllers/rulesController";
+
 var express = require('express');
 var router = express.Router();
 
@@ -24,4 +26,7 @@ router.post('/api/visitschedule_program_encounter_rule',programEncounterControll
 router.post('/api/visitschedule_individual_rule',individualController.visitScheduleRules);
 
 router.post('/api/checklist_program_enrolment_rule',programEnrolmentController.checkListRules);
+
+router.post('/api/rules', rulesController)
+
 module.exports = router;

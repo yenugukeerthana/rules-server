@@ -16,7 +16,7 @@ const removeStrictFromRuleCode = (rule) => rule.replace(/"use strict";/ig, '');
 
 const context = {console, ruleServiceLibraryInterfaceForSharingModules, _: lodash};
 
-export const decisionRule = async (rule,entity) => {
+export const decisionRule = (rule,entity) => {
     const defaultDecisions = {
         "enrolmentDecisions": [],
         "encounterDecisions": [],
@@ -30,7 +30,7 @@ export const decisionRule = async (rule,entity) => {
     return ruleDecisions;
 }
 
-export const visitScheduleRule = async (rule,entity,scheduledVisits) => {
+export const visitScheduleRule = (rule,entity,scheduledVisits) => {
     const ruleFunc = safeEval(removeStrictFromRuleCode(rule), context);
     const nextVisits = ruleFunc({
         params: { visitSchedule: scheduledVisits, entity, common, motherCalculations },
@@ -39,7 +39,7 @@ export const visitScheduleRule = async (rule,entity,scheduledVisits) => {
     return nextVisits;
 }
 
-export const checkListRule = async (rule,entity) => {
+export const checkListRule = (rule,entity) => {
     const allChecklistDetails = JSON.parse('[{"uuid":"123-3454-56756-789","name":"Vaccination","items":[{"uuid":"123-456-789-5456"}]}]');
     const ruleFunc = safeEval(removeStrictFromRuleCode(rule), context);
     const nextVisits = ruleFunc({
