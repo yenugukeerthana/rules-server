@@ -1,9 +1,9 @@
 import * as rulesConfig from 'rules-config';
-import lodash from 'lodash';
+import lodash, {isEmpty} from 'lodash';
 import moment from 'moment';
 import safeEval from 'safe-eval';
 import * as models from "openchs-models";
-import { common, motherCalculations } from "avni-health-modules";
+import {common, motherCalculations} from "avni-health-modules";
 
 const ruleServiceLibraryInterfaceForSharingModules = {
     log: console.log,
@@ -16,13 +16,15 @@ const removeStrictFromRuleCode = (rule) => rule.replace(/"use strict";/ig, '');
 
 const context = {console, ruleServiceLibraryInterfaceForSharingModules, _: lodash};
 
-export const decisionRule = (rule,entity) => {
+export const decisionRule = (rule, entity) => {
     const defaultDecisions = {
         "enrolmentDecisions": [],
         "encounterDecisions": [],
         "registrationDecisions": []
     };
-    const ruleFunc = safeEval(removeStrictFromRuleCode(rule), context);
+    let code = removeStrictFromRuleCode(rule);
+    if (isEmpty(code)) return defaultDecisions;
+    const ruleFunc = safeEval(code, context);
     const ruleDecisions = ruleFunc({
         params: {decisions: defaultDecisions, entity, common, motherCalculations},
         imports: {rulesConfig, lodash, moment}
@@ -30,21 +32,23 @@ export const decisionRule = (rule,entity) => {
     return ruleDecisions;
 }
 
-export const visitScheduleRule = (rule,entity,scheduledVisits) => {
-    const ruleFunc = safeEval(removeStrictFromRuleCode(rule), context);
+export const visitScheduleRule = (rule, entity, scheduledVisits) => {
+    let code = removeStrictFromRuleCode(rule);
+    if (isEmpty(code)) return scheduledVisits;
+    const ruleFunc = safeEval(code, context);
     const nextVisits = ruleFunc({
-        params: { visitSchedule: scheduledVisits, entity, common, motherCalculations },
-        imports: { rulesConfig, lodash, moment }
+        params: {visitSchedule: scheduledVisits, entity, common, motherCalculations},
+        imports: {rulesConfig, lodash, moment}
     });
     return nextVisits;
 }
 
-export const checkListRule = (rule,entity) => {
+export const checkListRule = (rule, entity) => {
     const allChecklistDetails = JSON.parse('[{"uuid":"123-3454-56756-789","name":"Vaccination","items":[{"uuid":"123-456-789-5456"}]}]');
     const ruleFunc = safeEval(removeStrictFromRuleCode(rule), context);
     const nextVisits = ruleFunc({
-        params: { checklistDetails: allChecklistDetails, entity, common, motherCalculations },
-        imports: { rulesConfig, lodash, moment }
+        params: {checklistDetails: allChecklistDetails, entity, common, motherCalculations},
+        imports: {rulesConfig, lodash, moment}
     });
     return nextVisits;
 }
