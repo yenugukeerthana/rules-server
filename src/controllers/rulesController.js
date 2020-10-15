@@ -1,5 +1,4 @@
-import {executeRule} from '../RuleExecutorNew';
-import {buildFailureResponse} from "./Common";
+import {executeRule} from '../RuleExecutor';
 
 export const rulesController = (req, res, next) => {
     try {
@@ -8,7 +7,14 @@ export const rulesController = (req, res, next) => {
         res.status(200)
             .json(ruleResponse);
     } catch (err) {
-        //TODO: inline this
-        buildFailureResponse(res, err);
+        console.log(err);
+        res.status(222)
+            .json({
+                status: 'failure',
+                error: {
+                    message: err.message,
+                    stack: err.stack
+                }
+            })
     }
 }
