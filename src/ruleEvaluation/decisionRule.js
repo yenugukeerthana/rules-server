@@ -1,5 +1,5 @@
 import * as rulesConfig from 'rules-config';
-import lodash, {isEmpty} from 'lodash';
+import lodash, {isEmpty, forEach, reject} from 'lodash';
 import moment from 'moment';
 import safeEval from 'safe-eval';
 import * as models from "openchs-models";
@@ -29,7 +29,15 @@ export const decisionRule = (rule, entity) => {
         params: {decisions: defaultDecisions, entity, common, motherCalculations},
         imports: {rulesConfig, lodash, moment}
     });
-    return ruleDecisions;
+    const trimDecisionsMap = (decisionsMap) => {
+        const trimmedDecisions = {};
+        forEach(decisionsMap, (decisions, decisionType) => {
+            trimmedDecisions[decisionType] = reject(reject(decisions, isEmpty), (d) => isEmpty(d.value));
+        });
+        return trimmedDecisions;
+    };
+    const trimmedDecisions = trimDecisionsMap(ruleDecisions);
+    return trimmedDecisions;
 }
 
 export const visitScheduleRule = (rule, entity, scheduledVisits) => {
