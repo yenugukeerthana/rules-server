@@ -12,7 +12,7 @@ const ruleServiceLibraryInterfaceForSharingModules = {
     models: models
 };
 
-const removeStrictFromRuleCode = (rule) => rule.replace(/"use strict";/ig, '');
+const removeStrictFromRuleCode = (rule) => rule.replace(/"use strict";|'use strict';/ig, '');
 
 const context = {console, ruleServiceLibraryInterfaceForSharingModules, _: lodash};
 
@@ -51,12 +51,13 @@ export const visitScheduleRule = (rule, entity, scheduledVisits) => {
     return nextVisits;
 }
 
-export const checkListRule = (rule, entity) => {
-    const allChecklistDetails = JSON.parse('[{"uuid":"123-3454-56756-789","name":"Vaccination","items":[{"uuid":"123-456-789-5456"}]}]');
-    const ruleFunc = safeEval(removeStrictFromRuleCode(rule), context);
-    const nextVisits = ruleFunc({
-        params: {checklistDetails: allChecklistDetails, entity, common, motherCalculations},
+export const checkListRule = (rule, entity, checklistDetails) => {
+    const code = removeStrictFromRuleCode(rule);
+    if (isEmpty(code)) return [];
+    const ruleFunc = safeEval(code, context);
+    const checklists = ruleFunc({
+        params: {checklistDetails: checklistDetails, entity, common, motherCalculations},
         imports: {rulesConfig, lodash, moment}
     });
-    return nextVisits;
-}
+    return checklists;
+};

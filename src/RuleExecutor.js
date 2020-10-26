@@ -2,7 +2,7 @@ import {mapProgramEncounter} from './models/programEncounterModel';
 import {mapEncounter} from './models/encounterModel';
 import {mapIndividual} from './models/individualModel';
 import {mapProgramEnrolment} from './models/programEnrolmentModel';
-import {decisionRule, visitScheduleRule} from './ruleEvaluation/decisionRule';
+import {checkListRule, decisionRule, visitScheduleRule} from './ruleEvaluation/decisionRule';
 
 const transformVisitScheduleDates = (visitSchedules) => {
     visitSchedules.forEach((visitSchedule, index, array) => {
@@ -14,6 +14,7 @@ const transformVisitScheduleDates = (visitSchedules) => {
 
 const decisionCode = (requestBody) => requestBody.rule.decisionCode;
 const visitScheduleCode = (requestBody) => requestBody.rule.visitScheduleCode;
+const checklistCode = (requestBody) => requestBody.rule.checklistCode;
 
 const mappers = {
     "Individual": mapIndividual,
@@ -28,7 +29,8 @@ export const executeRule = (requestBody) => {
         throw new Error("Value of workFlowType param is invalid");
     return {
         "decisions": decisionRule(decisionCode(requestBody), mapper(requestBody)),
-        "visitSchedules": transformVisitScheduleDates(visitScheduleRule(visitScheduleCode(requestBody), mapper(requestBody), requestBody.visitSchedules))
+        "visitSchedules": transformVisitScheduleDates(visitScheduleRule(visitScheduleCode(requestBody), mapper(requestBody), requestBody.visitSchedules)),
+        "checklists": checkListRule(checklistCode(requestBody), mapper(requestBody), requestBody.checklistDetails)
     }
 }
 
