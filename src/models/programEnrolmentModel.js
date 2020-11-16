@@ -11,7 +11,6 @@ export const mapProgramEnrolment = (request) => {
     programEnrolment.enrolmentDateTime = request.enrolmentDateTime;
     programEnrolment.programExitDateTime = request.programExitDateTime;
     programEnrolment.voided = request.voided;
-    console.log(`programEnrolmentModel: trying to set observations`);
     if(request.observations != undefined){
         programEnrolment.observations = mapObservations(request.observations);
     }

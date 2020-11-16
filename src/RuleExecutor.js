@@ -2,7 +2,7 @@ import {mapProgramEncounter} from './models/programEncounterModel';
 import {mapEncounter} from './models/encounterModel';
 import {mapIndividual} from './models/individualModel';
 import {mapProgramEnrolment} from './models/programEnrolmentModel';
-import {checkListRule, decisionRule, visitScheduleRule} from './ruleEvaluation/decisionRule';
+import {checkListRule, decisionRule, visitScheduleRule} from './services/RuleEvalService';
 
 const transformVisitScheduleDates = (visitSchedules) => {
     visitSchedules.forEach((visitSchedule, index, array) => {
@@ -11,11 +11,6 @@ const transformVisitScheduleDates = (visitSchedules) => {
     });
     return visitSchedules;
 }
-
-const decisionCode = (requestBody) => requestBody.rule.decisionCode;
-const visitScheduleCode = (requestBody) => requestBody.rule.visitScheduleCode;
-const checklistCode = (requestBody) => requestBody.rule.checklistCode;
-
 const mappers = {
     "Individual": mapIndividual,
     "ProgramEnrolment": mapProgramEnrolment,
@@ -23,14 +18,15 @@ const mappers = {
     "Encounter": mapEncounter
 }
 
-export const executeRule = (requestBody) => {
-    const mapper = mappers[requestBody.rule.workFlowType];
-    if (!mapper)
+export const executeRule = async (requestBody) => {
+    const mapEntity = mappers[requestBody.rule.workFlowType];
+    if (!mapEntity)
         throw new Error("Value of workFlowType param is invalid");
+    const entity = mapEntity(requestBody);
     return {
-        "decisions": decisionRule(decisionCode(requestBody), mapper(requestBody)),
-        "visitSchedules": transformVisitScheduleDates(visitScheduleRule(visitScheduleCode(requestBody), mapper(requestBody), requestBody.visitSchedules)),
-        "checklists": checkListRule(checklistCode(requestBody), mapper(requestBody), requestBody.checklistDetails)
+        "decisions": await decisionRule(requestBody.rule, entity),
+        "visitSchedules": transformVisitScheduleDates(await visitScheduleRule(requestBody.rule, entity, requestBody.visitSchedules)),
+        "checklists": await checkListRule(requestBody.rule, entity, requestBody.checklistDetails)
     }
 }
 

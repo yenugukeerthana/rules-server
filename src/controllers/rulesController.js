@@ -1,11 +1,10 @@
 import {executeRule} from '../RuleExecutor';
 
-export const rulesController = (req, res, next) => {
+export const rulesController = async (req, res, next) => {
     try {
-        const ruleResponse = executeRule(req.body);
+        const ruleResponse = await executeRule(req.body);
         ruleResponse.status = "success";
-        res.status(200)
-            .json(ruleResponse);
+        res.status(200).json(ruleResponse);
     } catch (err) {
         console.log(err);
         res.status(222)

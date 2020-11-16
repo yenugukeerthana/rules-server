@@ -2,9 +2,9 @@ import {
     Encounter,
     ModelGeneral as General,
     EncounterType,
+    ProgramEnrolment
 } from "openchs-models";
 import { mapObservations } from "./observationModel";
-import ProgramEnrolment from "openchs-models/dist/ProgramEnrolment";
 import {mapIndividual} from "./individualModel";
 
 export const mapEncounter = (request) => {

@@ -1,20 +1,19 @@
 {
-  "name": "api",
+  "name": "rules-server",
   "version": "1.0.0",
-  "description": "api",
+  "description": "Avni Node Server. Used to do server side evaluation of rules",
   "main": "index.js",
   "dependencies": {
     "@babel/polyfill": "^7.8.7",
-    "avni-health-modules": "0.0.7",
+    "avni-health-modules": "0.0.9",
+    "axios": "^0.21.0",
     "babel-plugin-module-resolver": "^3.2.0",
-    "bluebird": "^3.4.6",
     "body-parser": "^1.19.0",
     "express": "^4.14.0",
     "lodash": "^4.17.11",
     "moment": "^2.22.2",
-    "openchs-models": "0.2.10",
-    "pg-promise": "^5.3.5",
-    "rules-config": "github:openchs/rules-config#db9d68448cbc6c9122ca2aa03eb42c64f590d02c",
+    "openchs-models": "0.2.51",
+    "rules-config": "github:openchs/rules-config#3c6ceb7d49a1ddb7dada099ab60c1b8e824ed7f3",
     "safe-eval": "^0.4.1",
     "uuid": "^7.0.2"
   },
@@ -29,8 +28,7 @@
     "@babel/runtime": "7.4.4",
     "babel-plugin-transform-class-properties": "6.24.1",
     "jest": "^26.4.2",
-    "nodemon": "^2.0.2",
-    "openchs-models": "0.2.10"
+    "nodemon": "^2.0.2"
   },
   "scripts": {
     "start": "nodemon app.js",
