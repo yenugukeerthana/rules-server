@@ -1,8 +1,7 @@
-import {defaults, identity, isEmpty, isFunction} from "lodash";
+import {defaults, identity, isFunction} from "lodash";
 import { common, motherCalculations } from "avni-health-modules";
 import * as models from "openchs-models";
 import api from "./api";
-import evalRule from "./evalRule";
 
 class RuleService {
     constructor() {
@@ -42,7 +41,6 @@ class RuleService {
         `;
         let rulesConfig = eval(wrappedCode);
         /**********/
-        console.log(`RuleService: ${rulesConfig}`);
         return {...rulesConfig};
     }
 

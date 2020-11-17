@@ -16,25 +16,24 @@ import ruleService from "./RuleService";
 
 const removeStrictFromRuleCode = (rule) => isNil(rule) ? "" : rule.replace(/"use strict";|'use strict';/ig, '');
 
+const trimDecisionsMap = (decisionsMap) => {
+    const trimmedDecisions = {};
+    forEach(decisionsMap, (decisions, decisionType) => {
+        trimmedDecisions[decisionType] = reject(reject(decisions, isEmpty), (d) => isEmpty(d.value));
+    });
+    return trimmedDecisions;
+};
+
+const defaultDecisions = {
+    "enrolmentDecisions": [],
+    "encounterDecisions": [],
+    "registrationDecisions": []
+};
+
 export const decisionRule = async (rule, entity) => {
     const entityName = get(entity, "constructor.schema.name");
-    const defaultDecisions = {
-        "enrolmentDecisions": [],
-        "encounterDecisions": [],
-        "registrationDecisions": []
-    };
-
-    const trimDecisionsMap = (decisionsMap) => {
-        const trimmedDecisions = {};
-        forEach(decisionsMap, (decisions, decisionType) => {
-            trimmedDecisions[decisionType] = reject(reject(decisions, isEmpty), (d) => isEmpty(d.value));
-        });
-        return trimmedDecisions;
-    };
-
+    const code = removeStrictFromRuleCode(rule.decisionCode);
     const rulesFromTheBundle = await getAllRuleItemsFor(rule.formUuid, "Decision", "Form");
-
-    let code = removeStrictFromRuleCode(rule.decisionCode);
     if (!_.isEmpty(_.trim(code))) {
         const ruleFunc = evalRule(code);
         const ruleDecisions = ruleFunc({
@@ -53,26 +52,49 @@ export const decisionRule = async (rule, entity) => {
     return defaultDecisions;
 }
 
-export const visitScheduleRule = (rule, entity, scheduledVisits) => {
-    let code = removeStrictFromRuleCode(rule.visitScheduleCode);
-    if (isEmpty(code)) return scheduledVisits;
-    const ruleFunc = evalRule(code);
-    const nextVisits = ruleFunc({
-        params: {visitSchedule: scheduledVisits, entity, common, motherCalculations},
-        imports: {rulesConfig, lodash, moment}
-    });
-    return nextVisits;
+export const visitScheduleRule = async (rule, entity, scheduledVisits) => {
+    const entityName = get(entity, "constructor.schema.name");
+    const code = removeStrictFromRuleCode(rule.visitScheduleCode);
+    const rulesFromTheBundle = await getAllRuleItemsFor(rule.formUuid, "VisitSchedule", "Form");
+
+    if (!isEmpty(code)) {
+        const ruleFunc = evalRule(code);
+        const nextVisits = ruleFunc({
+            params: {visitSchedule: scheduledVisits, entity, common, motherCalculations},
+            imports: {rulesConfig, lodash, moment}
+        });
+        return nextVisits;
+    } else if (!isEmpty(rulesFromTheBundle)) {
+        const nextVisits = rulesFromTheBundle
+            .reduce((schedule, rule) => {
+                console.log(`RuleEvaluationService`, `Executing Rule: ${rule.name} Class: ${rule.fnName}`);
+                return runRuleAndSaveFailure(rule, entityName, entity, schedule);
+            }, scheduledVisits);
+        console.log("RuleEvaluationService - Next Visits", nextVisits);
+        return nextVisits;
+    }
+    return scheduledVisits;
 }
 
-export const checkListRule = (rule, entity, checklistDetails) => {
+export const checkListRule = async (rule, entity, checklistDetails) => {
+    const entityName = get(entity, "constructor.schema.name");
     const code = removeStrictFromRuleCode(rule.checklistCode);
-    if (isEmpty(code)) return [];
-    const ruleFunc = evalRule(code);
-    const checklists = ruleFunc({
-        params: {checklistDetails: checklistDetails, entity, common, motherCalculations},
-        imports: {rulesConfig, lodash, moment}
-    });
-    return checklists;
+    const rulesFromTheBundle = await getAllRuleItemsFor(rule.formUuid, "Checklists", "Form")
+
+    if (!isEmpty(code)) {
+        const ruleFunc = evalRule(code);
+        const checklists = ruleFunc({
+            params: {checklistDetails: checklistDetails, entity, common, motherCalculations},
+            imports: {rulesConfig, lodash, moment}
+        });
+
+        return checklists;
+    } else if (!isEmpty(rulesFromTheBundle)) {
+        const allChecklists = rulesFromTheBundle
+            .reduce((checklists, rule) => runRuleAndSaveFailure(rule, entityName, entity, checklistDetails), []);
+        return allChecklists;
+    }
+    return [];
 };
 
 const getAllRuleItemsFor = async (entityUuid, type, entityType) => {
