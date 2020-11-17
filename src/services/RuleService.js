@@ -1,14 +1,13 @@
 import {defaults, identity, isEmpty, isFunction} from "lodash";
+import { common, motherCalculations } from "avni-health-modules";
+import * as models from "openchs-models";
 import api from "./api";
 import evalRule from "./evalRule";
 
-
 class RuleService {
-
     constructor() {
         this.cache = {};
     }
-
 
     async getApplicableRules(entityUuid, ruleType, ruledEntityType) {
         console.log("RuleService",
@@ -30,17 +29,20 @@ class RuleService {
     }
 
     async _getRuleFunctionsFromBundle() {
-        const bundleCode = await api.getLegacyRulesBundle();
+        let bundleCode = await api.getLegacyRulesBundle();
         let ruleServiceLibraryInterfaceForSharingModules = {
             log: console.log,
             common: common,
             motherCalculations: motherCalculations,
             models: models
         };
-        let rulesConfig = isEmpty(bundleCode)
-            ? {}
-            : evalRule(bundleCode.concat("rulesConfig;"));
+        let wrappedCode = `
+            ${bundleCode}
+            rulesConfig;
+        `;
+        let rulesConfig = eval(wrappedCode);
         /**********/
+        console.log(`RuleService: ${rulesConfig}`);
         return {...rulesConfig};
     }
 
