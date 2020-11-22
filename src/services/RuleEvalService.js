@@ -24,13 +24,12 @@ const trimDecisionsMap = (decisionsMap) => {
     return trimmedDecisions;
 };
 
-const defaultDecisions = {
-    "enrolmentDecisions": [],
-    "encounterDecisions": [],
-    "registrationDecisions": []
-};
-
 export const decisionRule = async (rule, entity) => {
+    const defaultDecisions = {
+        "enrolmentDecisions": [],
+        "encounterDecisions": [],
+        "registrationDecisions": []
+    };
     const entityName = get(entity, "constructor.schema.name");
     const code = removeStrictFromRuleCode(rule.decisionCode);
     const rulesFromTheBundle = await getAllRuleItemsFor(rule.formUuid, "Decision", "Form");
@@ -116,8 +115,6 @@ const runRuleAndSaveFailure = (rule, entityName, entity, ruleTypeValue, config, 
         }
     } catch (error) {
         console.log("Rule-Failure", `Rule failed: ${rule.name}, uuid: ${rule.uuid}`);
-        //TODO: Implement saving rule failures by calling API
-        // this.saveFailedRules(error, rule.uuid, this.getIndividualUUID(entity, entityName));
         return ruleTypeValue;
     }
 };
