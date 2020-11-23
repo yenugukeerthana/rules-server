@@ -2,14 +2,14 @@
 
 ## Installation
 ```
-npm install
+make deps
 ```
 
-##Configuration
-Ensure that the server/db.js file postgres database connection is updated. Below find the standard configuration
+## Starting the server
 ```
-var connectionString = 'postgres://postgres:root@localhost:5432/openchs';
+make start
 ```
+
 
 
 
