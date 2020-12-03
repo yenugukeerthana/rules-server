@@ -15,15 +15,18 @@ export const mapIndividual = individualDetails => {
     ["uuid", "firstName", "lastName"],
     ["registrationDate","dateOfBirth"]
   );
-  const gender = new Gender();
-  gender.name = individualDetails.gender.name;
-  gender.uuid = individualDetails.gender.uuid;
-  individual.gender = gender;
 
   const subjectType = new SubjectType();
   subjectType.uuid = individualDetails.subjectType.uuid;
   subjectType.name = individualDetails.subjectType.name;
   individual.subjectType = subjectType;
+
+  if(subjectType.isPerson()) {
+    const gender = new Gender();
+    gender.name = individualDetails.gender.name;
+    gender.uuid = individualDetails.gender.uuid;
+    individual.gender = gender;
+  }
 
   const addressLevel = new AddressLevel();
   addressLevel.uuid = individualDetails.lowestAddressLevel.uuid;
