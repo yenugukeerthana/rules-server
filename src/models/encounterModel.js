@@ -11,8 +11,8 @@ export const mapEncounter = (request) => {
     const encounter = General.assignFields(
         request,
         new Encounter(),
-        ["uuid", "encounterDateTime", "name", "dateOfBirth"],
-        ["earliestVisitDateTime","maxVisitDateTime","cancelDateTime"]
+        ["uuid", "name"],
+        ["encounterDateTime", "earliestVisitDateTime","maxVisitDateTime","cancelDateTime"]
       );
     encounter.encounterType = createEncounterType(request.encounterType);
     if(request.observations != undefined){
@@ -58,8 +58,8 @@ const mapBasicEncounter = (request) => {
     return General.assignFields(
         request,
         new Encounter(),
-        ["uuid", "encounterDateTime", "name", "dateOfBirth"],
-        ["earliestVisitDateTime","maxVisitDateTime","cancelDateTime"]
+        ["uuid", "name"],
+        ["encounterDateTime", "earliestVisitDateTime","maxVisitDateTime","cancelDateTime"]
       );
 }
 

@@ -1,30 +1,30 @@
 import {
     ProgramEncounter,
-    EncounterType,
+    EncounterType, ModelGeneral as General,
 } from "openchs-models";
 import { mapObservations } from "./observationModel";
 import { mapProgramEnrolment } from "./programEnrolmentModel";
 
 export const mapProgramEncounter = (request) => {
-    const entity = new ProgramEncounter();
-    entity.uuid = request.uuid;
-    entity.name = request.name;
-    entity.encounterType = mapEncounterType(request.encounterType);
-    entity.earliestVisitDateTime = request.earliestVisitDateTime;
-    entity.maxVisitDateTime = request.maxVisitDateTime;
-    entity.encounterDateTime = request.encounterDateTime;
-    entity.programEnrolment = null;
-    if(request.observations != undefined){
-        entity.observations = mapObservations(request.observations);
-        console.log(`programEncounterModel: modal ${JSON.stringify(entity.observations)}`);
+    const programEncounter = General.assignFields(
+        request,
+        new ProgramEncounter(),
+        ["uuid", "name"],
+        ["encounterDateTime", "earliestVisitDateTime", "maxVisitDateTime", "cancelDateTime"]
+    );
+    programEncounter.encounterType = mapEncounterType(request.encounterType);
+    programEncounter.programEnrolment = null;
+    if(request.observations){
+        programEncounter.observations = mapObservations(request.observations);
+        console.log(`programEncounterModel: observations ${JSON.stringify(programEncounter.observations)}`);
     }
-    if(request.cancelObservations != undefined){
-        entity.cancelObservations = mapObservations(request.cancelObservations);
+    if(request.cancelObservations){
+        programEncounter.cancelObservations = mapObservations(request.cancelObservations);
     }
-    if(request.programEnrolment != undefined){
-        entity.programEnrolment = mapProgramEnrolment(request.programEnrolment);
+    if(request.programEnrolment){
+        programEncounter.programEnrolment = mapProgramEnrolment(request.programEnrolment);
     }
-    return entity;
+    return programEncounter;
 }
 
 const mapEncounterType = (encounterTypeParam) => {

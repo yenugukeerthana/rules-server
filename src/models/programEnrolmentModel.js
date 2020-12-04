@@ -1,4 +1,5 @@
 import {
+    ModelGeneral as General,
     ProgramEnrolment,
 } from "openchs-models";
 import {mapObservations} from "./observationModel";
@@ -6,10 +7,12 @@ import { mapIndividual } from "./individualModel";
 import { mapProgramEncounter } from "./programEncounterModel";
 
 export const mapProgramEnrolment = (request) => {
-    const programEnrolment = new ProgramEnrolment();
-    programEnrolment.uuid = request.uuid;
-    programEnrolment.enrolmentDateTime = request.enrolmentDateTime;
-    programEnrolment.programExitDateTime = request.programExitDateTime;
+    const programEnrolment = General.assignFields(
+        request,
+        new ProgramEnrolment(),
+        ["uuid"],
+        ["enrolmentDateTime", "programExitDateTime"]
+    );
     programEnrolment.voided = request.voided;
     if(request.observations != undefined){
         programEnrolment.observations = mapObservations(request.observations);
