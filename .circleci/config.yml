@@ -27,7 +27,7 @@ commands:
           command: |
             ssh -o StrictHostKeyChecking=no ec2-user@<< parameters.hostname >> \<< EOF
             sudo rm -rf /opt/rules-server
-            sudo unzip /tmp/rules-server.zip -d /opt/
+            sudo unzip -qq /tmp/rules-server.zip -d /opt/
             cd /opt/rules-server
             chmod a+x /opt/rules-server/deploy/install.sh
             sudo ./deploy/install.sh
