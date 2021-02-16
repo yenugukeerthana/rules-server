@@ -1,18 +1,10 @@
 import * as rulesConfig from 'rules-config';
-import lodash, {isEmpty, forEach, reject, sortBy, get, isNil} from 'lodash';
+import lodash, {forEach, get, isEmpty, isNil, reject, sortBy} from 'lodash';
 import moment from 'moment';
-import {
-    common,
-    encounterDecision,
-    familyRegistrationDecision,
-    individualRegistrationDecision,
-    motherCalculations,
-    programEncounterDecision,
-    programEnrolmentDecision,
-    RuleRegistry
-} from "avni-health-modules";
+import {common, motherCalculations, RuleRegistry} from "avni-health-modules";
 import evalRule from "./evalRule";
 import ruleService from "./RuleService";
+import {individualService} from "./IndividualService";
 
 const removeStrictFromRuleCode = (rule) => isNil(rule) ? "" : rule.replace(/"use strict";|'use strict';/ig, '');
 
@@ -22,6 +14,10 @@ const trimDecisionsMap = (decisionsMap) => {
         trimmedDecisions[decisionType] = reject(reject(decisions, isEmpty), (d) => isEmpty(d.value));
     });
     return trimmedDecisions;
+};
+
+const services = {
+    individualService,
 };
 
 export const decisionRule = async (rule, entity) => {
@@ -36,7 +32,7 @@ export const decisionRule = async (rule, entity) => {
     if (!_.isEmpty(_.trim(code))) {
         const ruleFunc = evalRule(code);
         const ruleDecisions = ruleFunc({
-            params: {decisions: defaultDecisions, entity, common, motherCalculations},
+            params: {decisions: defaultDecisions, entity, common, motherCalculations, services},
             imports: {rulesConfig, lodash, moment}
         });
         const trimmedDecisions = trimDecisionsMap(ruleDecisions);
@@ -49,7 +45,7 @@ export const decisionRule = async (rule, entity) => {
         return trimmedDecisions;
     }
     return defaultDecisions;
-}
+};
 
 export const visitScheduleRule = async (rule, entity, scheduledVisits) => {
     const entityName = get(entity, "constructor.schema.name");
@@ -59,7 +55,7 @@ export const visitScheduleRule = async (rule, entity, scheduledVisits) => {
     if (!isEmpty(code)) {
         const ruleFunc = evalRule(code);
         const nextVisits = ruleFunc({
-            params: {visitSchedule: scheduledVisits, entity, common, motherCalculations},
+            params: {visitSchedule: scheduledVisits, entity, common, motherCalculations, services},
             imports: {rulesConfig, lodash, moment}
         });
         return nextVisits;
@@ -73,17 +69,17 @@ export const visitScheduleRule = async (rule, entity, scheduledVisits) => {
         return nextVisits;
     }
     return scheduledVisits;
-}
+};
 
 export const checkListRule = async (rule, entity, checklistDetails) => {
     const entityName = get(entity, "constructor.schema.name");
     const code = removeStrictFromRuleCode(rule.checklistCode);
-    const rulesFromTheBundle = await getAllRuleItemsFor(rule.formUuid, "Checklists", "Form")
+    const rulesFromTheBundle = await getAllRuleItemsFor(rule.formUuid, "Checklists", "Form");
 
     if (!isEmpty(code)) {
         const ruleFunc = evalRule(code);
         const checklists = ruleFunc({
-            params: {checklistDetails: checklistDetails, entity, common, motherCalculations},
+            params: {checklistDetails: checklistDetails, entity, common, motherCalculations, services},
             imports: {rulesConfig, lodash, moment}
         });
 
