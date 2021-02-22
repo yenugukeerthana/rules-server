@@ -2,6 +2,9 @@ import {defaults, identity, isFunction} from "lodash";
 import { common, motherCalculations } from "avni-health-modules";
 import * as models from "openchs-models";
 import api from "./api";
+import cache from "./cache";
+import axios from "axios";
+import {ORGANISATION_UUID_HEADER} from "../controllers/UserHeaders";
 
 class RuleService {
     constructor() {
@@ -28,20 +31,27 @@ class RuleService {
     }
 
     async _getRuleFunctionsFromBundle() {
-        let bundleCode = await api.getLegacyRulesBundle();
-        let ruleServiceLibraryInterfaceForSharingModules = {
-            log: console.log,
-            common: common,
-            motherCalculations: motherCalculations,
-            models: models
-        };
-        let wrappedCode = `
-            ${bundleCode}
-            rulesConfig;
-        `;
-        let rulesConfig = eval(wrappedCode);
-        /**********/
-        return {...rulesConfig};
+        const orgUuid = axios.defaults.headers.common[ORGANISATION_UUID_HEADER];
+        let result = cache[orgUuid];
+        if(result) {
+            console.log("RuleService", "Cache hit successful");
+            return result;
+        } else {
+            console.log("RuleService", "Cache hit unsuccessful");
+            let bundleCode = await api.getLegacyRulesBundle();
+            let ruleServiceLibraryInterfaceForSharingModules = {
+                log: console.log,
+                common: common,
+                motherCalculations: motherCalculations,
+                models: models
+            };
+            let wrappedCode = `
+                ${bundleCode}
+                rulesConfig;
+            `;
+            cache[orgUuid] = eval(wrappedCode);
+            return cache[orgUuid];
+        }
     }
 
     async _getRules() {

@@ -1,6 +1,7 @@
 import {executeRule} from '../RuleExecutor';
 import {ORGANISATION_UUID_HEADER, AUTH_TOKEN_HEADER, USER_NAME_HEADER} from "./UserHeaders";
 import axios from "axios";
+import cache from "../services/cache";
 
 export const rulesController = async (req, res, next) => {
     try {
@@ -19,6 +20,12 @@ export const rulesController = async (req, res, next) => {
                 }
             })
     }
+}
+
+export const cleanRulesCache = async (req, res, next) => {
+    const orgUuid = axios.defaults.headers.common[ORGANISATION_UUID_HEADER];
+    delete cache[orgUuid];
+    res.status(200).send('Cleaned the rules bundle cache');
 }
 
 const setGlobalAxiosHeaders = (req) => {
