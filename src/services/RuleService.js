@@ -1,4 +1,4 @@
-import {defaults, identity, isFunction} from "lodash";
+import {defaults, identity, isFunction, isEmpty} from "lodash";
 import { common, motherCalculations } from "avni-health-modules";
 import * as models from "openchs-models";
 import api from "./api";
@@ -24,6 +24,7 @@ class RuleService {
     }
 
     async _getRuleFunctions(rules = []) {
+    	if (isEmpty(rules)) return [];
         const allRules = await this._getRuleFunctionsFromBundle();
         return defaults(rules, [])
             .filter(ar => isFunction(allRules[ar.fnName]) && isFunction(allRules[ar.fnName].exec))
