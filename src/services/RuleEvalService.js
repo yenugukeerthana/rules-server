@@ -92,6 +92,38 @@ export const checkListRule = async (rule, entity, checklistDetails) => {
     return [];
 };
 
+export const programSummaryRule = async (rule, entity) => {
+    const entityName = get(entity, "constructor.schema.name");
+    const code = removeStrictFromRuleCode(rule.programSummaryCode);
+    const rulesFromTheBundle = await getAllRuleItemsFor(rule.formUuid, "EnrolmentSummary", "Program");
+    if (!isEmpty(code)) {
+        const ruleFunc = evalRule(code);
+        let summaries = ruleFunc({
+            params: {summaries: [], programEnrolment: entity, services},
+            imports: {rulesConfig, lodash, moment}
+        });
+        return summaries;
+    } else if (!isEmpty(rulesFromTheBundle)) {
+        const summaries = rulesFromTheBundle
+            .reduce((summaries, rule) => runRuleAndSaveFailure(rule, entityName, entity, summaries, new Date()), []);
+        return summaries;
+    }
+    return [];
+};
+
+export const subjectSummaryRule = async (rule, entity) => {
+    const code = removeStrictFromRuleCode(rule.subjectSummaryCode);
+    if (!isEmpty(code)) {
+        const ruleFunc = evalRule(code);
+        let summaries = ruleFunc({
+            params: {summaries: [], individual: entity, services},
+            imports: {rulesConfig, lodash, moment}
+        });
+        return summaries;
+    }
+    return [];
+};
+
 const getAllRuleItemsFor = async (entityUuid, type, entityType) => {
     const applicableRules = RuleRegistry.getRulesFor(entityUuid, type, entityType); //Core module rules
     const additionalRules = await ruleService.getApplicableRules(entityUuid, type, entityType);

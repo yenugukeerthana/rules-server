@@ -6,6 +6,7 @@ import {
 } from "openchs-models";
 import { mapObservations } from "./observationModel";
 import {mapIndividual} from "./individualModel";
+import {mapEntityApprovalStatus} from "./entityApprovalStatusModel";
 
 export const mapEncounter = (request) => {
     const encounter = General.assignFields(
@@ -30,6 +31,7 @@ export const mapEncounter = (request) => {
             encounter.individual.encounters = mapEncounters(request.subject.encounters);
         }
     }
+    encounter.latestEntityApprovalStatus = mapEntityApprovalStatus(request.latestEntityApprovalStatus);
     return encounter;
 }
 

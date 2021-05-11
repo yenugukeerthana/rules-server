@@ -13,5 +13,9 @@ export default {
     getLegacyRules: () =>
         axios
             .get(BASE_URL + "/rule/search/lastModified?lastModifiedDateTime=1900-01-01T00:00:00.000Z&size=1000")
-            .then(response => get(response, "data._embedded.rule"))
+            .then(response => get(response, "data._embedded.rule")),
+    getSubjects: (addressLevelUUID, subjectTypeName) =>
+        axios
+            .get(BASE_URL + `/subject/search?addressLevelUUID=${addressLevelUUID}&subjectTypeName=${subjectTypeName}`)
+            .then(response => get(response, 'data')),
 };

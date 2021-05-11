@@ -5,6 +5,7 @@ import {
 import {mapObservations} from "./observationModel";
 import { mapIndividual } from "./individualModel";
 import { mapProgramEncounter } from "./programEncounterModel";
+import {mapEntityApprovalStatus} from "./entityApprovalStatusModel";
 
 export const mapProgramEnrolment = (request) => {
     const programEnrolment = General.assignFields(
@@ -27,5 +28,6 @@ export const mapProgramEnrolment = (request) => {
     if(request.programEncounters != undefined){
         programEnrolment.encounters = request.programEncounters.map(programEncounter => mapProgramEncounter(programEncounter));
     }
+    programEnrolment.latestEntityApprovalStatus = mapEntityApprovalStatus(request.latestEntityApprovalStatus);
     return programEnrolment;
 }

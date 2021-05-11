@@ -1,4 +1,4 @@
-import {executeRule} from '../RuleExecutor';
+import {executeRule, executeSummaryRule} from '../RuleExecutor';
 import {ORGANISATION_UUID_HEADER, AUTH_TOKEN_HEADER, USER_NAME_HEADER} from "./UserHeaders";
 import axios from "axios";
 import cache from "../services/cache";
@@ -10,16 +10,31 @@ export const rulesController = async (req, res, next) => {
         ruleResponse.status = "success";
         res.status(200).json(ruleResponse);
     } catch (err) {
-        console.log(err);
-        res.status(222)
-            .json({
-                status: 'failure',
-                error: {
-                    message: err.message,
-                    stack: err.stack
-                }
-            })
+        catchRuleError(err, res);
     }
+}
+
+export const summary = async (req, res, next) => {
+    try {
+        setGlobalAxiosHeaders(req);
+        const ruleResponse = await executeSummaryRule(req.body);
+        ruleResponse.status = "success";
+        res.status(200).json(ruleResponse);
+    } catch (err) {
+        catchRuleError(err, res);
+    }
+};
+
+function catchRuleError(err, res) {
+    console.log(err);
+    res.status(222)
+        .json({
+            status: 'failure',
+            error: {
+                message: err.message,
+                stack: err.stack
+            }
+        })
 }
 
 export const cleanRulesCache = async (req, res, next) => {

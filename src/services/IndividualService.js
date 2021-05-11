@@ -1,10 +1,15 @@
+import api from "./api";
+import {map} from 'lodash';
+import {mapIndividual} from "../models/individualModel";
+
 class IndividualService {
 
     constructor() {
     }
 
     getSubjectsInLocation(addressLevel, subjectTypeName) {
-        throw Error("getSubjectsInLocation method is not supported for DEA")
+       return api.getSubjects(addressLevel.uuid, subjectTypeName)
+           .then(subjects => map(subjects, subject => mapIndividual(subject)));
     }
 
 }

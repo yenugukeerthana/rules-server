@@ -4,6 +4,7 @@ import {
 } from "openchs-models";
 import { mapObservations } from "./observationModel";
 import { mapProgramEnrolment } from "./programEnrolmentModel";
+import {mapEntityApprovalStatus} from "./entityApprovalStatusModel";
 
 export const mapProgramEncounter = (request) => {
     const programEncounter = General.assignFields(
@@ -24,6 +25,7 @@ export const mapProgramEncounter = (request) => {
     if(request.programEnrolment){
         programEncounter.programEnrolment = mapProgramEnrolment(request.programEnrolment);
     }
+    programEncounter.latestEntityApprovalStatus = mapEntityApprovalStatus(request.latestEntityApprovalStatus);
     return programEncounter;
 }
 

@@ -12,7 +12,7 @@
     "express": "^4.14.0",
     "lodash": "^4.17.11",
     "moment": "^2.22.2",
-    "openchs-models": "0.2.51",
+    "openchs-models": "1.5.1",
     "rules-config": "github:openchs/rules-config#3c6ceb7d49a1ddb7dada099ab60c1b8e824ed7f3",
     "safe-eval": "^0.4.1",
     "uuid": "^7.0.2"

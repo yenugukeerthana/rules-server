@@ -7,6 +7,9 @@ import {
 } from "openchs-models";
 import { mapObservations } from "./observationModel";
 import { mapEncounter } from "./encounterModel";
+import {mapEntityApprovalStatus} from "./entityApprovalStatusModel";
+import {map, isEmpty} from 'lodash';
+import {mapProgramEnrolment} from "./programEnrolmentModel";
 
 export const mapIndividual = individualDetails => {
   const individual = General.assignFields(
@@ -34,19 +37,14 @@ export const mapIndividual = individualDetails => {
   individual.lowestAddressLevel = addressLevel;
 
   individual.observations = mapObservations(individualDetails["observations"]);
+  individual.latestEntityApprovalStatus = mapEntityApprovalStatus(individualDetails.latestEntityApprovalStatus);
+  if (!isEmpty(individualDetails.encounters)) {
+    individual.encounters = map(individualDetails.encounters, encounter => mapEncounter(encounter))
+  }
+
+  if (!isEmpty(individualDetails.enrolments)) {
+    individual.enrolments = map(individualDetails.enrolments, enrolment => mapProgramEnrolment(enrolment))
+  }
 
   return individual;
-};
-
-//subject Dashboard profile Tab
-export const mapProfile = subjectProfile => {
-  if (subjectProfile) {
-    let individual = mapIndividual(subjectProfile);
-    if(subjectProfile["encounters"] != undefined){
-      individual.encounters = subjectProfile["encounters"].map(encounters => {
-        return mapEncounter(encounters);
-      });
-    }
-    return individual;
-  }
 };
