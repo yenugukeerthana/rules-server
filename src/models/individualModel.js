@@ -1,14 +1,8 @@
-import {
-  Individual,
-  ModelGeneral as General,
-  Gender,
-  AddressLevel,
-  SubjectType
-} from "openchs-models";
-import { mapObservations } from "./observationModel";
-import { mapEncounter } from "./encounterModel";
+import {AddressLevel, Gender, Individual, ModelGeneral as General, SubjectType} from "openchs-models";
+import {mapObservations} from "./observationModel";
+import {mapEncounter} from "./encounterModel";
 import {mapEntityApprovalStatus} from "./entityApprovalStatusModel";
-import {map, isEmpty} from 'lodash';
+import {isEmpty, isNil, map} from 'lodash';
 import {mapProgramEnrolment} from "./programEnrolmentModel";
 
 export const mapIndividual = individualDetails => {
@@ -19,9 +13,7 @@ export const mapIndividual = individualDetails => {
     ["registrationDate","dateOfBirth"]
   );
 
-  const subjectType = new SubjectType();
-  subjectType.uuid = individualDetails.subjectType.uuid;
-  subjectType.name = individualDetails.subjectType.name;
+  const subjectType = mapSubjectType(individualDetails.subjectType);
   individual.subjectType = subjectType;
 
   if(subjectType.isPerson()) {
@@ -47,4 +39,11 @@ export const mapIndividual = individualDetails => {
   }
 
   return individual;
+};
+
+const mapSubjectType = request => {
+  if (isNil(request)) {
+    return new SubjectType();
+  }
+  return General.assignFields(request, new SubjectType(), ["uuid", "name", "type"]);
 };

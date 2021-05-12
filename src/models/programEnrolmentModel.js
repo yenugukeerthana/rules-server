@@ -22,7 +22,6 @@ export const mapProgramEnrolment = (request) => {
         programEnrolment.programExitObservations = mapObservations(request.exitObservations);
     }
     if(request.subject != undefined){
-        //TODO: add encounters and enrolments to individual
         programEnrolment.individual = mapIndividual(request.subject);
     }
     if(request.programEncounters != undefined){
