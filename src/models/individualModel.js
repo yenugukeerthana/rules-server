@@ -30,12 +30,16 @@ export const mapIndividual = individualDetails => {
 
   individual.observations = mapObservations(individualDetails["observations"]);
   individual.latestEntityApprovalStatus = mapEntityApprovalStatus(individualDetails.latestEntityApprovalStatus);
-  if (!isEmpty(individualDetails.encounters)) {
+  if (!isNil(individualDetails.encounters)) {
     individual.encounters = map(individualDetails.encounters, encounter => mapEncounter(encounter))
+  } else {
+    individual.encounters = [];
   }
 
-  if (!isEmpty(individualDetails.enrolments)) {
+  if (!isNil(individualDetails.enrolments)) {
     individual.enrolments = map(individualDetails.enrolments, enrolment => mapProgramEnrolment(enrolment))
+  } else {
+    individual.enrolments = [];
   }
 
   return individual;
