@@ -12,8 +12,8 @@
     "express": "^4.14.0",
     "lodash": "^4.17.11",
     "moment": "^2.22.2",
-    "openchs-models": "1.5.1",
-    "rules-config": "github:openchs/rules-config#8206c29f7cc5cd2710dfa783ea28b283941ac306",
+    "openchs-models": "1.10.0",
+    "rules-config": "github:openchs/rules-config#63d79be538846a80ab2a05e90cadcc17909c48a4",
     "safe-eval": "^0.4.1",
     "uuid": "^7.0.2"
   },
