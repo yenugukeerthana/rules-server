@@ -10,7 +10,7 @@ import {
     visitScheduleRule
 } from './services/RuleEvalService';
 
-const transformVisitScheduleDates = (visitSchedules) => {
+export const transformVisitScheduleDates = (visitSchedules) => {
     visitSchedules.forEach((visitSchedule, index, array) => {
         array[index].maxDate = visitSchedule.maxDate ? new Date(visitSchedule.maxDate).getTime() : null;
         array[index].earliestDate = visitSchedule.earliestDate ? new Date(visitSchedule.earliestDate).getTime() : null;

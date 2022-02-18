@@ -5,6 +5,7 @@ import {common, motherCalculations, RuleRegistry} from "avni-health-modules";
 import evalRule from "./evalRule";
 import ruleService from "./RuleService";
 import {individualService} from "./IndividualService";
+import {FormElementStatus} from "openchs-models";
 
 const removeStrictFromRuleCode = (rule) => isNil(rule) ? "" : rule.replace(/"use strict";|'use strict';/ig, '');
 
@@ -145,4 +146,56 @@ const runRuleAndSaveFailure = (rule, entityName, entity, ruleTypeValue, config, 
         console.log("Rule-Failure", `Rule failed: ${rule.name}, uuid: ${rule.uuid}`);
         return ruleTypeValue;
     }
+};
+
+const runFormElementGroupRule = (formElementGroup, entity) => {
+    if (_.isNil(formElementGroup.rule) || _.isEmpty(_.trim(formElementGroup.rule))) {
+        return formElementGroup
+            .getFormElements()
+            .map(formElement => new FormElementStatus(formElement.uuid, true, undefined));
+    }
+    try {
+        const ruleFunc = eval(formElementGroup.rule);
+        return ruleFunc({
+            params: {formElementGroup, entity, services},
+            imports: {rulesConfig, lodash, moment, common}
+        });
+    } catch (e) {
+        console.error(
+            `Rule-Failure for formElement group name: ${formElementGroup.name} Error message : ${e}`
+        );
+    }
+};
+
+export const getFormElementsStatuses = (entity, formElementGroup) => {
+    if ([entity, formElementGroup].some(_.isEmpty)) return [];
+    const formElementsWithRules = formElementGroup.getFormElements().filter(formElement => !_.isNil(formElement.rule) && !_.isEmpty(_.trim(formElement.rule)));
+    const formElementStatusAfterGroupRule = runFormElementGroupRule(formElementGroup, entity);
+    const visibleFormElementsUUIDs = _.filter(formElementStatusAfterGroupRule, ({visibility}) => visibility === true).map(({uuid}) => uuid);
+    if (!_.isEmpty(formElementsWithRules) && !_.isEmpty(visibleFormElementsUUIDs)) {
+        let formElementStatuses = formElementsWithRules
+            .filter(({uuid}) => _.includes(visibleFormElementsUUIDs, uuid))
+            .map(formElement => {
+                try {
+                    const ruleFunc = eval(formElement.rule);
+                    return ruleFunc({
+                        params: {formElement, entity, services},
+                        imports: {rulesConfig, lodash, moment, common}
+                    });
+                } catch (e) {
+                    console.error(
+                        `Rule-Failure for formElement name: ${formElement.name} Error message: ${
+                            e.message
+                        } stack: ${e.stack}`
+                    );
+                    return null;
+                }
+            })
+            .filter(fs => !_.isNil(fs))
+            .reduce((all, curr) => all.concat(curr), formElementStatusAfterGroupRule)
+            .reduce((acc, fs) => acc.set(fs.uuid, fs), new Map())
+            .values();
+        return [...formElementStatuses];
+    }
+     return formElementStatusAfterGroupRule;
 };

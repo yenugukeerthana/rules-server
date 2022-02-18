@@ -2,6 +2,7 @@ import {executeRule, executeSummaryRule} from '../RuleExecutor';
 import {ORGANISATION_UUID_HEADER, AUTH_TOKEN_HEADER, USER_NAME_HEADER} from "./UserHeaders";
 import axios from "axios";
 import cache from "../services/cache";
+import {BuildObservations} from "../observationBuilder/BuildObservations";
 
 export const rulesController = async (req, res, next) => {
     try {
@@ -56,3 +57,17 @@ const setGlobalAxiosHeaders = (req) => {
     if(orgUuid)
         axios.defaults.headers.common[ORGANISATION_UUID_HEADER] = orgUuid;
 }
+
+
+export const buildObservationAndRunRules = async (req, res, next) => {
+    try {
+        setGlobalAxiosHeaders(req);
+        const responseContract = await BuildObservations(req.body);
+        res.status(200).json(responseContract);
+    } catch (err) {
+        res.status(222)
+            .json({
+                errors: [`Error in rule server. Message: "${err.message}", Stack: "${err.stack}"`]
+            })
+    }
+};
