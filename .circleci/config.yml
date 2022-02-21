@@ -47,14 +47,14 @@ jobs:
       - restore_cache:
           key: dependency-cache-{{ checksum "package.json" }}
 
-      - run: yarn install
+      - run: npm install
 
       - save_cache:
           key: dependency-cache-{{ checksum "package.json" }}
           paths:
             - ./node_modules
 
-      - run: yarn test
+      - run: npm test
 
   app_build:
     docker:
@@ -68,7 +68,7 @@ jobs:
       - restore_cache:
           key: dependency-cache-{{ checksum "package.json" }}
 
-      - run: yarn install
+      - run: npm install
 
       - save_cache:
           key: dependency-cache-{{ checksum "package.json" }}
