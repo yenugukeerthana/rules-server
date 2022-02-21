@@ -18,4 +18,9 @@ export default {
         axios
             .get(BASE_URL + `/subject/search?addressLevelUUID=${addressLevelUUID}&subjectTypeName=${subjectTypeName}`)
             .then(response => get(response, 'data')),
+    getCognitoDetails: () => axios.get(`${BASE_URL}/cognito-details`).then(res => res.data),
+    uploadToS3: (url, oldValue) => axios.get(`${BASE_URL}/upload/media?url=${url}&oldValue=${oldValue}`)
+        .then(res => res.data),
+    getSubjectOrLocationObsValue: (entityType, ids, formElementUuid) => axios.get(`${BASE_URL}/upload?type=${entityType}&ids=${ids}&formElementUuid=${formElementUuid}`)
+        .then(res => res.data)
 };

@@ -3,7 +3,6 @@ import {
     chain,
     differenceWith,
     filter,
-    find,
     flatMap,
     forEach,
     get,
@@ -33,6 +32,7 @@ import {mapEncounter} from "../models/encounterModel";
 import {mapProgramEncounter} from "../models/programEncounterModel";
 import {mapProgramEnrolment} from "../models/programEnrolmentModel";
 import {transformVisitScheduleDates} from "../RuleExecutor";
+import api from "../services/api";
 
 const DATE_FORMAT = `YYYY-MM-DD`;
 
@@ -58,15 +58,14 @@ export const BuildObservations = async ({row, form, entity}) => {
             allValidationResults.push(validationResult);
         }
     };
-    forEach(formModel.getFormElementGroups(), (feg) => {
-        forEach(feg.getFormElements(), fe => {
+    for (const feg of formModel.getFormElementGroups()) {
+        for (const fe of feg.getFormElements()) {
             const concept = fe.concept;
-            const obsValue = addObservationValue(observationsHolder, concept, fe, trim(row[concept.name]), errors);
+            const obsValue = await addObservationValue(observationsHolder, concept, fe, trim(row[concept.name]), errors);
             entityModel.observations = observationsHolder.observations;
             const formElementStatuses = getFormElementStatuses(entityModel, feg, observationsHolder);
             const filteredFormElements = FormElementGroup._sortedFormElements(feg.filterElements(formElementStatuses));
             observationsHolder.updatePrimitiveCodedObs(filteredFormElements, formElementStatuses);
-            const currentFormElementStatus = find(formElementStatuses, ({uuid}) => uuid === fe.uuid);
             const validationResults = validate(
                 fe,
                 obsValue,
@@ -75,8 +74,8 @@ export const BuildObservations = async ({row, form, entity}) => {
                 formElementStatuses
             );
             handleValidationResults(validationResults);
-        })
-    });
+        }
+    }
     pushErrorMessages(formModel, allValidationResults, errors);
     const observations = map(entityModel.observations, (obs) => obs.toResource);
     const responseObject = {observations, errors};
@@ -108,7 +107,7 @@ const pushErrorMessages = (form, allValidationResults, errors) => {
     })
 };
 
-function addObservationValue(observationsHolder, concept, fe, answerValue, errors) {
+async function addObservationValue(observationsHolder, concept, fe, answerValue, errors) {
     switch (concept.datatype) {
         case Concept.dataType.Coded:
             if (fe.isMultiSelect()) {
@@ -151,7 +150,26 @@ function addObservationValue(observationsHolder, concept, fe, answerValue, error
         case Concept.dataType.PhoneNumber:
             observationsHolder.updatePhoneNumberValue(concept, answerValue, false);
             return answerValue;
-        //TODO: subject, location and media are not supported
+        case Concept.dataType.Image:
+        case Concept.dataType.Video: {
+            const oldValue = observationsHolder.getObservationReadableValue(concept);
+            const {value, error} = await api.uploadToS3(answerValue, oldValue);
+            if (error) {
+                errors.push(`Concept: "${concept.name}" Error message: "${error}"`)
+            }
+            observationsHolder.addOrUpdatePrimitiveObs(concept, value);
+            return value;
+        }
+        case Concept.dataType.Subject: {
+            const {value} = await api.getSubjectOrLocationObsValue(Concept.dataType.Subject, answerValue, fe.uuid);
+            observationsHolder.addOrUpdatePrimitiveObs(concept, value);
+            return fe.isMultiSelect() ? new MultipleCodedValues(value) : new SingleCodedValue(value);
+        }
+        case Concept.dataType.Location: {
+            const {value} = await api.getSubjectOrLocationObsValue(Concept.dataType.Location, answerValue, fe.uuid);
+            observationsHolder.addOrUpdatePrimitiveObs(concept, value);
+            return fe.isMultiSelect() ? new MultipleCodedValues(value) : new SingleCodedValue(value);
+        }
         default:
             observationsHolder.addOrUpdatePrimitiveObs(concept, answerValue);
             return answerValue;

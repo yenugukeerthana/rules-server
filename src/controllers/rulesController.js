@@ -3,6 +3,7 @@ import {ORGANISATION_UUID_HEADER, AUTH_TOKEN_HEADER, USER_NAME_HEADER} from "./U
 import axios from "axios";
 import cache from "../services/cache";
 import {BuildObservations} from "../observationBuilder/BuildObservations";
+import {setUploadUser} from "../services/AuthService";
 
 export const rulesController = async (req, res, next) => {
     try {
@@ -62,6 +63,7 @@ const setGlobalAxiosHeaders = (req) => {
 export const buildObservationAndRunRules = async (req, res, next) => {
     try {
         setGlobalAxiosHeaders(req);
+        await setUploadUser();
         const responseContract = await BuildObservations(req.body);
         res.status(200).json(responseContract);
     } catch (err) {
