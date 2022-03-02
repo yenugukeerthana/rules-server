@@ -33,6 +33,7 @@ import {transformVisitScheduleDates} from "../RuleExecutor";
 import api from "../services/api";
 
 const DATE_FORMAT = `YYYY-MM-DD`;
+const TIME_FORMAT = 'HH:mm';
 
 const formTypeToEntityMapper = {
     IndividualProfile: mapIndividual,
@@ -142,6 +143,11 @@ async function addObservationValue(observationsHolder, concept, fe, answerValue,
         }
         case Concept.dataType.DateTime: {
             const value = moment(answerValue).toISOString();
+            observationsHolder.addOrUpdatePrimitiveObs(concept, value);
+            break;
+        }
+        case Concept.dataType.Time: {
+            const value = moment(answerValue, TIME_FORMAT).format(TIME_FORMAT);
             observationsHolder.addOrUpdatePrimitiveObs(concept, value);
             break;
         }
