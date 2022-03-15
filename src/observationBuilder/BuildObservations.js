@@ -17,12 +17,7 @@ import {
     toNumber,
     trim
 } from 'lodash';
-import {
-    Concept,
-    FormElementGroup,
-    ObservationsHolder,
-    ValidationResult,
-} from "openchs-models";
+import {Concept, FormElementGroup, ObservationsHolder, ValidationResult,} from "openchs-models";
 import moment from "moment";
 import {decisionRule, getFormElementsStatuses, visitScheduleRule} from "../services/RuleEvalService";
 import {mapIndividual} from "../models/individualModel";
@@ -58,12 +53,13 @@ export const BuildObservations = async ({row, form, entity}) => {
         }
     };
     for (const feg of formModel.getFormElementGroups()) {
+        let filteredFormElements = [];
         for (const fe of feg.getFormElements()) {
             const concept = fe.concept;
-            await addObservationValue(observationsHolder, concept, fe, trim(row[concept.name]), errors);
+            await addObservationValue(observationsHolder, concept, fe, row, errors, formModel);
             entityModel.observations = observationsHolder.observations;
             const formElementStatuses = getFormElementStatuses(entityModel, feg, observationsHolder);
-            const filteredFormElements = FormElementGroup._sortedFormElements(feg.filterElements(formElementStatuses));
+            filteredFormElements = FormElementGroup._sortedFormElements(feg.filterElements(formElementStatuses));
             observationsHolder.updatePrimitiveCodedObs(filteredFormElements, formElementStatuses);
             const obsValue = observationsHolder.getObservationReadableValue(concept);
             const validationResults = validate(
@@ -75,6 +71,8 @@ export const BuildObservations = async ({row, form, entity}) => {
             );
             handleValidationResults(validationResults);
         }
+        const validationResults = feg.validate(observationsHolder, filteredFormElements);
+        handleValidationResults(validationResults);
     }
     pushErrorMessages(formModel, allValidationResults, errors);
     const observations = map(entityModel.observations, (obs) => obs.toResource);
@@ -107,7 +105,40 @@ const pushErrorMessages = (form, allValidationResults, errors) => {
     })
 };
 
-async function addObservationValue(observationsHolder, concept, fe, answerValue, errors) {
+const getParentFormElement = (form, parentFormElementUuid) => {
+    let formElement;
+    _.forEach(form.getFormElementGroups(), (formElementGroup) => {
+        const foundFormElement = _.find(
+            formElementGroup.getFormElements(),
+            (formElement) => formElement.uuid === parentFormElementUuid
+        );
+        if (!_.isNil(foundFormElement)) formElement = foundFormElement;
+    });
+    return formElement;
+};
+
+const updateQuestionGroupFormElement = (parentFormElement, formElement, value, observationHolder) => {
+    observationHolder.updateGroupQuestion(_.get(parentFormElement, 'concept'), formElement.concept, value, formElement)
+};
+
+const getAnswerValue = (parentFormElement, formElement, row) => {
+    const headerName = _.isNil(parentFormElement) ? formElement.concept.name : `${_.get(parentFormElement, 'concept.name')}|${formElement.concept.name}`;
+    return row[headerName];
+};
+
+const addOrUpdateObs = (isChildFormElement, parentFormElement, fe, value, observationsHolder) => {
+    if (isChildFormElement) {
+        updateQuestionGroupFormElement(parentFormElement, fe, value, observationsHolder);
+    } else {
+        observationsHolder.addOrUpdateObservation(fe.concept, value);
+    }
+};
+
+async function addObservationValue(observationsHolder, concept, fe, row, errors, form) {
+    const isChildFormElement = !_.isNil(fe.groupUuid);
+    const parentFormElement = isChildFormElement ? getParentFormElement(form, fe.groupUuid) : null;
+    const answerValue = getAnswerValue(parentFormElement, fe, row);
+    if (_.isEmpty(answerValue) || _.isNil(answerValue)) return;
     switch (concept.datatype) {
         case Concept.dataType.Coded:
             if (fe.isMultiSelect()) {
@@ -121,34 +152,38 @@ async function addObservationValue(observationsHolder, concept, fe, answerValue,
                         errors.push(`Column: "${concept.name}" Error message: "Answer concept ${answerName} not found."`)
                     }
                 });
-                observationsHolder.addOrUpdateObservation(concept, answerUUIDs);
+                if (isChildFormElement) {
+                    _.forEach(answerUUIDs, uuid => updateQuestionGroupFormElement(parentFormElement, fe, uuid, observationsHolder));
+                } else {
+                    observationsHolder.addOrUpdateObservation(fe.concept, answerUUIDs);
+                }
             } else {
                 const conceptAnswer = concept.getAnswerWithConceptName(answerValue);
                 if (!isNil(conceptAnswer)) {
-                    observationsHolder.addOrUpdateObservation(concept, conceptAnswer.concept.uuid);
+                    addOrUpdateObs(isChildFormElement, parentFormElement, fe, conceptAnswer.concept.uuid, observationsHolder);
                 } else {
                     errors.push(`Column: "${concept.name}" Error message: "Answer concept ${answerValue} not found."`);
                 }
             }
             break;
         case Concept.dataType.Numeric: {
-            const value = toNumber(answerValue);
-            observationsHolder.addOrUpdatePrimitiveObs(concept, value);
+            const value = _.isEmpty(answerValue) ? null : toNumber(answerValue);
+            addOrUpdateObs(isChildFormElement, parentFormElement, fe, value, observationsHolder);
             break;
         }
         case Concept.dataType.Date: {
             const value = moment(answerValue).format(DATE_FORMAT);
-            observationsHolder.addOrUpdatePrimitiveObs(concept, value);
+            addOrUpdateObs(isChildFormElement, parentFormElement, fe, value, observationsHolder);
             break;
         }
         case Concept.dataType.DateTime: {
             const value = moment(answerValue).toISOString();
-            observationsHolder.addOrUpdatePrimitiveObs(concept, value);
+            addOrUpdateObs(isChildFormElement, parentFormElement, fe, value, observationsHolder);
             break;
         }
         case Concept.dataType.Time: {
             const value = moment(answerValue, TIME_FORMAT).format(TIME_FORMAT);
-            observationsHolder.addOrUpdatePrimitiveObs(concept, value);
+            addOrUpdateObs(isChildFormElement, parentFormElement, fe, value, observationsHolder);
             break;
         }
         case Concept.dataType.PhoneNumber:
@@ -161,21 +196,23 @@ async function addObservationValue(observationsHolder, concept, fe, answerValue,
             if (error) {
                 errors.push(`Column: "${concept.name}" Error message: "${error}"`)
             }
-            observationsHolder.addOrUpdatePrimitiveObs(concept, value);
+            addOrUpdateObs(isChildFormElement, parentFormElement, fe, value, observationsHolder);
             break;
         }
         case Concept.dataType.Subject: {
             const {value} = await api.getSubjectOrLocationObsValue(Concept.dataType.Subject, answerValue, fe.uuid);
-            observationsHolder.addOrUpdatePrimitiveObs(concept, value);
+            addOrUpdateObs(isChildFormElement, parentFormElement, fe, value, observationsHolder);
             break;
         }
         case Concept.dataType.Location: {
             const {value} = await api.getSubjectOrLocationObsValue(Concept.dataType.Location, answerValue, fe.uuid);
-            observationsHolder.addOrUpdatePrimitiveObs(concept, value);
+            addOrUpdateObs(isChildFormElement, parentFormElement, fe, value, observationsHolder);
             break;
         }
+        case Concept.dataType.QuestionGroup:
+            break;
         default:
-            observationsHolder.addOrUpdatePrimitiveObs(concept, answerValue);
+            addOrUpdateObs(isChildFormElement, parentFormElement, fe, answerValue, observationsHolder);
             break;
     }
 }

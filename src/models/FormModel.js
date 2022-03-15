@@ -53,6 +53,7 @@ const mapFormElement = formElementJson => {
             "rule"
         ]
     );
+    formElement.groupUuid = formElementJson.parentFormElementUuid;
     formElement.keyValues = map(formElementJson.keyValues, KeyValue.fromResource);
     formElement.validFormat = Format.fromResource(formElementJson["validFormat"]);
     formElement.concept = mapConcept(formElementJson.concept);
