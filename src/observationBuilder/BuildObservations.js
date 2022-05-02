@@ -26,6 +26,7 @@ import {mapProgramEncounter} from "../models/programEncounterModel";
 import {mapProgramEnrolment} from "../models/programEnrolmentModel";
 import {transformVisitScheduleDates} from "../RuleExecutor";
 import api from "../services/api";
+import {getUploadUserToken} from "../services/AuthService";
 
 const DATE_FORMAT = `YYYY-MM-DD`;
 const TIME_FORMAT = 'HH:mm';
@@ -191,8 +192,9 @@ async function addObservationValue(observationsHolder, concept, fe, row, errors,
             break;
         case Concept.dataType.Image:
         case Concept.dataType.Video: {
+            const token = await getUploadUserToken();
             const oldValue = observationsHolder.getObservationReadableValue(concept);
-            const {value, error} = await api.uploadToS3(answerValue, oldValue);
+            const {value, error} = await api.uploadToS3(answerValue, oldValue, token);
             if (error) {
                 errors.push(`Column: "${concept.name}" Error message: "${error}"`)
             }
@@ -200,12 +202,14 @@ async function addObservationValue(observationsHolder, concept, fe, row, errors,
             break;
         }
         case Concept.dataType.Subject: {
-            const {value} = await api.getSubjectOrLocationObsValue(Concept.dataType.Subject, answerValue, fe.uuid);
+            const token = await getUploadUserToken();
+            const {value} = await api.getSubjectOrLocationObsValue(Concept.dataType.Subject, answerValue, fe.uuid, token);
             addOrUpdateObs(isChildFormElement, parentFormElement, fe, value, observationsHolder);
             break;
         }
         case Concept.dataType.Location: {
-            const {value} = await api.getSubjectOrLocationObsValue(Concept.dataType.Location, answerValue, fe.uuid);
+            const token = await getUploadUserToken();
+            const {value} = await api.getSubjectOrLocationObsValue(Concept.dataType.Location, answerValue, fe.uuid, token);
             addOrUpdateObs(isChildFormElement, parentFormElement, fe, value, observationsHolder);
             break;
         }

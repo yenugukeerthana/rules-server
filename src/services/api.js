@@ -18,9 +18,27 @@ export default {
         axios
             .get(BASE_URL + `/subject/search?addressLevelUUID=${addressLevelUUID}&subjectTypeName=${subjectTypeName}`)
             .then(response => get(response, 'data')),
-    getCognitoDetails: () => axios.get(`${BASE_URL}/cognito-details`).then(res => res.data),
-    uploadToS3: (url, oldValue) => axios.get(`${BASE_URL}/upload/media?url=${Buffer.from(url).toString('base64')}&oldValue=${oldValue}`)
-        .then(res => res.data),
-    getSubjectOrLocationObsValue: (entityType, ids, formElementUuid) => axios.get(`${BASE_URL}/upload?type=${entityType}&ids=${ids}&formElementUuid=${formElementUuid}`)
-        .then(res => res.data)
+    getCognitoDetails: () => axios({
+        url: `${BASE_URL}/cognito-details`,
+        method: 'get',
+        Headers: {
+            ["AUTH-TOKEN"]: null,
+        }
+    }).then(res => res.data),
+    uploadToS3: (url, oldValue, token) =>
+        axios({
+            url: `${BASE_URL}/upload/media?url=${Buffer.from(url).toString('base64')}&oldValue=${oldValue}`,
+            method: 'get',
+            Headers: {
+                ["AUTH-TOKEN"]: token,
+            }
+        }).then(res => res.data),
+    getSubjectOrLocationObsValue: (entityType, ids, formElementUuid, token) =>
+        axios({
+            url: `${BASE_URL}/upload?type=${entityType}&ids=${ids}&formElementUuid=${formElementUuid}`,
+            method: 'get',
+            Headers: {
+                ["AUTH-TOKEN"]: token,
+            }
+        }).then(res => res.data)
 };
