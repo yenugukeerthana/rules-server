@@ -5,6 +5,7 @@ import {Auth} from 'aws-amplify';
 // During CSV upload token sent by the java server might expire so we use upload-user for
 // communicating the java server
 export const setUploadUser = async () => {
+    console.log("Cognito details ", cognitoDetails);
     if (cognitoDetails.isEmpty()) {
         await api.getCognitoDetails().then((details) => {
             return cognitoDetails.setDetails(details);
@@ -22,6 +23,7 @@ const setupUploadUser = async () => {
         userPoolWebClientId: cognitoDetails.clientId
     });
     const currentUser = await Auth.currentUserInfo();
+    console.log("Current user info ", currentUser);
     if (_.isEmpty(currentUser) || currentUser.username !== 'upload-user') {
         await sigIn();
     }
@@ -32,6 +34,9 @@ const sigIn = async () => {
 };
 
 export const getUploadUserToken = async () => {
+    console.log("Getting upload user token");
     const currentSession = await Auth.currentSession();
-    return currentSession.idToken.jwtToken;
+    const jwtToken = currentSession.idToken.jwtToken;
+    console.log("Upload user token ", jwtToken);
+    return jwtToken;
 };
