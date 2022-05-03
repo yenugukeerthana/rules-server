@@ -21,7 +21,7 @@ export default {
     getCognitoDetails: () => axios({
         url: `${BASE_URL}/cognito-details`,
         method: 'get',
-        Headers: {
+        headers: {
             ["AUTH-TOKEN"]: null,
         }
     }).then(res => res.data),
@@ -29,7 +29,7 @@ export default {
         axios({
             url: `${BASE_URL}/upload/media?url=${Buffer.from(url).toString('base64')}&oldValue=${oldValue}`,
             method: 'get',
-            Headers: {
+            headers: {
                 ["AUTH-TOKEN"]: token,
             }
         }).then(res => res.data),
@@ -37,7 +37,7 @@ export default {
         axios({
             url: `${BASE_URL}/upload?type=${entityType}&ids=${ids}&formElementUuid=${formElementUuid}`,
             method: 'get',
-            Headers: {
+            headers: {
                 ["AUTH-TOKEN"]: token,
             }
         }).then(res => res.data)
