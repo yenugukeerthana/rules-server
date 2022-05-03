@@ -7,11 +7,12 @@ import {Auth} from 'aws-amplify';
 export const setUploadUser = async () => {
     console.log("Cognito details ", cognitoDetails);
     if (cognitoDetails.isEmpty()) {
-        await api.getCognitoDetails().then((details) => {
-            return cognitoDetails.setDetails(details);
-        })
+        const details = await api.getCognitoDetails();
+        console.log("Fetched details ", details);
+        cognitoDetails.setDetails(details);
     }
-    if(!cognitoDetails.isDummy()) {
+    if (!cognitoDetails.isDummy()) {
+        console.log("Setting up upload user");
         await setupUploadUser();
     }
 };
