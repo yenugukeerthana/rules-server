@@ -9,7 +9,7 @@ function mapBasicSubject(individualDetails) {
     const individual = General.assignFields(
         individualDetails,
         new Individual(),
-        ["uuid", "firstName", "lastName"],
+        ["uuid", "firstName", "lastName", "profilePicture"],
         ["registrationDate", "dateOfBirth"]
     );
 
