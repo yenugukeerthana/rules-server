@@ -24,15 +24,19 @@ export default {
         }
     }).then(res => res.data),
     uploadToS3: (url, oldValue, token) =>
-        axios.get(`${BASE_URL}/upload/media?url=${Buffer.from(url).toString('base64')}&oldValue=${oldValue}`, {
-            headers: {
-                "AUTH-TOKEN": token,
-            }
-        }).then(res => res.data),
+        axios.get(`${BASE_URL}/upload/media?url=${Buffer.from(url).toString('base64')}&oldValue=${oldValue}`, putTokenHeader(token))
+            .then(res => res.data),
     getSubjectOrLocationObsValue: (entityType, ids, formElementUuid, token) =>
-        axios.get(`${BASE_URL}/upload?type=${entityType}&ids=${ids}&formElementUuid=${formElementUuid}`, {
+        axios.get(`${BASE_URL}/upload?type=${entityType}&ids=${ids}&formElementUuid=${formElementUuid}`, putTokenHeader(token)).then(res => res.data)
+};
+
+
+const putTokenHeader = token => {
+    if (token) {
+        return {
             headers: {
                 "AUTH-TOKEN": token,
             }
-        }).then(res => res.data)
+        }
+    } else null;
 };

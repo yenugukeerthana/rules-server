@@ -35,6 +35,7 @@ const sigIn = async () => {
 };
 
 export const getUploadUserToken = async () => {
+    if(cognitoDetails.isDummy()) return null;
     console.log("Getting upload user token");
     const currentSession = await Auth.currentSession();
     const jwtToken = currentSession.idToken.jwtToken;

@@ -4,6 +4,7 @@ import axios from "axios";
 import cache from "../services/cache";
 import {BuildObservations} from "../observationBuilder/BuildObservations";
 import {setUploadUser} from "../services/AuthService";
+import {get} from 'lodash';
 
 export const rulesController = async (req, res, next) => {
     try {
@@ -69,7 +70,7 @@ export const buildObservationAndRunRules = async (req, res, next) => {
     } catch (err) {
         res.status(222)
             .json({
-                errors: [`Error in rule server. Message: "${err.message}", Stack: "${err.stack}"`]
+                errors: [`Error in rule server. Message: "${get(err, 'message')}", Stack: "${get(err, 'stack')}"`]
             })
     }
 };

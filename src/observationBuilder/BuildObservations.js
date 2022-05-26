@@ -193,12 +193,30 @@ async function addObservationValue(observationsHolder, concept, fe, row, errors,
         case Concept.dataType.Image:
         case Concept.dataType.Video: {
             const token = await getUploadUserToken();
-            const oldValue = observationsHolder.getObservationReadableValue(concept);
-            const {value, error} = await api.uploadToS3(answerValue, oldValue, token);
-            if (error) {
-                errors.push(`Column: "${concept.name}" Error message: "${error}"`)
+            if (fe.isMultiSelect()) {
+                const providedAnswers = splitMultiSelectAnswer(answerValue);
+                const s3Urls = [];
+                await Promise.all(_.map(providedAnswers, (answer) => {
+                    return api.uploadToS3(answer, null, token)
+                        .then(({value, error}) => {
+                            if (error) {
+                                errors.push(`Column: "${concept.name}" Error message: "${error}"`)
+                            } else {
+                                s3Urls.push(value)
+                            }
+                            return s3Urls;
+                        })
+                })).catch(error => errors.push(`Column: "${concept.name}" Error message: "${error}"`));
+                console.log("s3Urls =>>", s3Urls);
+                addOrUpdateObs(isChildFormElement, parentFormElement, fe, s3Urls, observationsHolder);
+            } else {
+                const oldValue = observationsHolder.getObservationReadableValue(concept);
+                const {value, error} = await api.uploadToS3(answerValue, oldValue, token);
+                if (error) {
+                    errors.push(`Column: "${concept.name}" Error message: "${error}"`)
+                }
+                addOrUpdateObs(isChildFormElement, parentFormElement, fe, value, observationsHolder);
             }
-            addOrUpdateObs(isChildFormElement, parentFormElement, fe, value, observationsHolder);
             break;
         }
         case Concept.dataType.Subject: {
