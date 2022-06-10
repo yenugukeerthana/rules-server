@@ -34,12 +34,12 @@ const mapFormElementGroup = (formElementGroupJson, form) => {
             "voided",
             "rule",
         ]);
-    formElementGroup.formElements = map(formElementGroupJson.formElements, fe => mapFormElement(fe));
+    formElementGroup.formElements = map(formElementGroupJson.formElements, fe => mapFormElement(fe, formElementGroup));
     formElementGroup.form = form;
     return formElementGroup;
 };
 
-const mapFormElement = formElementJson => {
+const mapFormElement = (formElementJson, formElementGroup) => {
     const formElement = General.assignFields(
         formElementJson,
         new FormElement(),
@@ -57,6 +57,7 @@ const mapFormElement = formElementJson => {
     formElement.keyValues = map(formElementJson.keyValues, KeyValue.fromResource);
     formElement.validFormat = Format.fromResource(formElementJson["validFormat"]);
     formElement.concept = mapConcept(formElementJson.concept);
+    formElement.formElementGroup = formElementGroup;
     return formElement;
 };
 

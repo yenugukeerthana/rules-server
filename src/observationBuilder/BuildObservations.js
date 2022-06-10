@@ -18,7 +18,7 @@ import {
     trim
 } from 'lodash';
 import {Concept, FormElementGroup, ObservationsHolder, ValidationResult,} from "openchs-models";
-import moment from "moment";
+import moment, {max} from "moment";
 import {decisionRule, getFormElementsStatuses, visitScheduleRule} from "../services/RuleEvalService";
 import {mapIndividual} from "../models/individualModel";
 import {mapEncounter} from "../models/encounterModel";
@@ -40,7 +40,7 @@ const formTypeToEntityMapper = {
 
 export const BuildObservations = async ({row, form, entity}) => {
     const entityModel = formTypeToEntityMapper[form.formType](entity);
-    const observationsHolder = new ObservationsHolder(entityModel.observations);
+    const observationsHolder = new ObservationsHolder([]);
     const errors = [];
     const formModel = mapForm(form);
     const allValidationResults = [];
@@ -55,9 +55,11 @@ export const BuildObservations = async ({row, form, entity}) => {
     };
     for (const feg of formModel.getFormElementGroups()) {
         let filteredFormElements = [];
-        for (const fe of feg.getFormElements()) {
+        const allFormElements = feg.getFormElements();
+        const allExceptChildFormElements = _.filter(allFormElements, fe => _.isNil(fe.groupUuid));
+        for (const fe of allExceptChildFormElements) {
             const concept = fe.concept;
-            await addObservationValue(observationsHolder, concept, fe, row, errors, formModel);
+            await addObservationValue(observationsHolder, concept, fe, row, errors, allFormElements);
             entityModel.observations = observationsHolder.observations;
             const formElementStatuses = getFormElementStatuses(entityModel, feg, observationsHolder);
             filteredFormElements = FormElementGroup._sortedFormElements(feg.filterElements(formElementStatuses));
@@ -106,40 +108,96 @@ const pushErrorMessages = (form, allValidationResults, errors) => {
     })
 };
 
-const getParentFormElement = (form, parentFormElementUuid) => {
-    let formElement;
-    _.forEach(form.getFormElementGroups(), (formElementGroup) => {
-        const foundFormElement = _.find(
-            formElementGroup.getFormElements(),
-            (formElement) => formElement.uuid === parentFormElementUuid
-        );
-        if (!_.isNil(foundFormElement)) formElement = foundFormElement;
-    });
-    return formElement;
-};
-
-const updateQuestionGroupFormElement = (parentFormElement, formElement, value, observationHolder) => {
-    observationHolder.updateGroupQuestion(_.get(parentFormElement, 'concept'), formElement.concept, value, formElement)
-};
-
-const getAnswerValue = (parentFormElement, formElement, row) => {
-    const headerName = _.isNil(parentFormElement) ? formElement.concept.name : `${_.get(parentFormElement, 'concept.name')}|${formElement.concept.name}`;
-    return row[headerName];
-};
-
-const addOrUpdateObs = (isChildFormElement, parentFormElement, fe, value, observationsHolder) => {
-    if (isChildFormElement) {
-        updateQuestionGroupFormElement(parentFormElement, fe, value, observationsHolder);
+const updateGroupQuestionObservations = (formElement, allFormElements, row, observationsHolder, errors) => {
+    const allChildren = _.filter(allFormElements, fe => fe.groupUuid === formElement.uuid);
+    if (formElement.repeatable) {
+        const repeatableQuestionGroupPattern = new RegExp(`${formElement.concept.name}\\|.*\\|\\d`);
+        const repeatableQuestionGroupHeaders = _.keys(row).filter(header => header.match(repeatableQuestionGroupPattern));
+        const maxIndex = _.max(repeatableQuestionGroupHeaders.map(h => h.split("|")[2]));
+        _.range(maxIndex).forEach(index => {
+            observationsHolder.updateRepeatableGroupQuestion(index, formElement, null, null, 'add');
+            allChildren.forEach(childFormElement => updateRepeatableGroupQuestionValue(formElement, childFormElement, row, errors, observationsHolder, index))
+        })
     } else {
-        observationsHolder.addOrUpdateObservation(fe.concept, value);
+        _.forEach(allChildren, childFormElement => updateGroupQuestionValue(formElement, childFormElement, row, errors, observationsHolder))
     }
 };
 
-async function addObservationValue(observationsHolder, concept, fe, row, errors, form) {
-    const isChildFormElement = !_.isNil(fe.groupUuid);
-    const parentFormElement = isChildFormElement ? getParentFormElement(form, fe.groupUuid) : null;
-    const answerValue = getAnswerValue(parentFormElement, fe, row);
-    if (_.isEmpty(answerValue) || _.isNil(answerValue)) return;
+const updateCodedObs = (childFormElement, answerValue, errors, updateObs) => {
+    const concept = childFormElement.concept;
+    if (childFormElement.isMultiSelect()) {
+        const providedAnswers = splitMultiSelectAnswer(answerValue);
+        const answerUUIDs = [];
+        forEach(providedAnswers, answerName => {
+            const conceptAnswer = concept.getAnswerWithConceptName(answerName);
+            if (!isNil(conceptAnswer)) {
+                answerUUIDs.push(conceptAnswer.concept.uuid)
+            } else {
+                errors.push(`Column: "${concept.name}" Error message: "Answer concept ${answerName} not found."`)
+            }
+        });
+        _.forEach(answerUUIDs, uuid => updateObs(uuid));
+
+    } else {
+        const conceptAnswer = concept.getAnswerWithConceptName(answerValue);
+        if (!isNil(conceptAnswer)) {
+            updateObs(conceptAnswer.concept.uuid);
+        } else {
+            errors.push(`Column: "${concept.name}" Error message: "Answer concept ${answerValue} not found."`);
+        }
+    }
+};
+
+const updateRepeatableGroupQuestionValue = (parentFormElement, childFormElement, row, errors, observationsHolder, questionGroupIndex) => {
+    const answerValue = getAnswerValue(childFormElement, row, parentFormElement, questionGroupIndex + 1);
+    const concept = childFormElement.concept;
+    if (concept.datatype === Concept.dataType.Coded) {
+        updateCodedObs(childFormElement, answerValue, errors, (value) => observationsHolder.updateRepeatableGroupQuestion(questionGroupIndex, parentFormElement, childFormElement, value));
+    } else {
+        observationsHolder.updateRepeatableGroupQuestion(questionGroupIndex, parentFormElement, childFormElement, answerValue)
+    }
+};
+
+
+const updateGroupQuestionValue = (parentFormElement, childFormElement, row, errors, observationsHolder, questionGroupIndex) => {
+    const answerValue = getAnswerValue(childFormElement, row, parentFormElement, questionGroupIndex);
+    const concept = childFormElement.concept;
+    if (concept.datatype === Concept.dataType.Coded) {
+        updateCodedObs(childFormElement, answerValue, errors, (value) => observationsHolder.updateGroupQuestion(parentFormElement, childFormElement, value));
+    } else {
+        observationsHolder.updateGroupQuestion(parentFormElement, childFormElement, answerValue)
+    }
+};
+
+const getAnswerValue = (formElement, row, parentFormElement, questionGroupIndex) => {
+    if (formElement.groupUuid) {
+        const parentChildName = `${parentFormElement.concept.name}|${formElement.concept.name}`;
+        const headerName = parentFormElement.repeatable ? `${parentChildName}|${questionGroupIndex}` : parentChildName;
+        return row[headerName];
+    }
+    return row[formElement.concept.name];
+};
+
+const addOrUpdateObs = (fe, value, observationsHolder) => {
+    observationsHolder.addOrUpdateObservation(fe.concept, value);
+};
+
+const isNonEmptyQuestionGroup = (formElement, allFormElements, row) => {
+    if (formElement.concept.datatype === Concept.dataType.QuestionGroup) {
+        const allChildren = _.filter(allFormElements, fe => fe.groupUuid === formElement.uuid);
+        return _.some(allChildren, fe => {
+            const parentChildName = `${formElement.concept.name}|${fe.concept.name}`;
+            const headerName = formElement.repeatable ? `${parentChildName}|1` : parentChildName;
+            const rowValue = row[headerName];
+            return !_.isEmpty(rowValue);
+        })
+    }
+    return false;
+};
+
+async function addObservationValue(observationsHolder, concept, fe, row, errors, allFormElements) {
+    const answerValue = getAnswerValue(fe, row);
+    if (!isNonEmptyQuestionGroup(fe, allFormElements, row) && (_.isEmpty(answerValue) || _.isNil(answerValue))) return;
     switch (concept.datatype) {
         case Concept.dataType.Coded:
             if (fe.isMultiSelect()) {
@@ -153,15 +211,11 @@ async function addObservationValue(observationsHolder, concept, fe, row, errors,
                         errors.push(`Column: "${concept.name}" Error message: "Answer concept ${answerName} not found."`)
                     }
                 });
-                if (isChildFormElement) {
-                    _.forEach(answerUUIDs, uuid => updateQuestionGroupFormElement(parentFormElement, fe, uuid, observationsHolder));
-                } else {
-                    observationsHolder.addOrUpdateObservation(fe.concept, answerUUIDs);
-                }
+                observationsHolder.addOrUpdateObservation(fe.concept, answerUUIDs);
             } else {
                 const conceptAnswer = concept.getAnswerWithConceptName(answerValue);
                 if (!isNil(conceptAnswer)) {
-                    addOrUpdateObs(isChildFormElement, parentFormElement, fe, conceptAnswer.concept.uuid, observationsHolder);
+                    addOrUpdateObs(fe, conceptAnswer.concept.uuid, observationsHolder);
                 } else {
                     errors.push(`Column: "${concept.name}" Error message: "Answer concept ${answerValue} not found."`);
                 }
@@ -169,22 +223,22 @@ async function addObservationValue(observationsHolder, concept, fe, row, errors,
             break;
         case Concept.dataType.Numeric: {
             const value = _.isEmpty(answerValue) ? null : toNumber(answerValue);
-            addOrUpdateObs(isChildFormElement, parentFormElement, fe, value, observationsHolder);
+            addOrUpdateObs(fe, value, observationsHolder);
             break;
         }
         case Concept.dataType.Date: {
             const value = moment(answerValue).format(DATE_FORMAT);
-            addOrUpdateObs(isChildFormElement, parentFormElement, fe, value, observationsHolder);
+            addOrUpdateObs(fe, value, observationsHolder);
             break;
         }
         case Concept.dataType.DateTime: {
             const value = moment(answerValue).toISOString();
-            addOrUpdateObs(isChildFormElement, parentFormElement, fe, value, observationsHolder);
+            addOrUpdateObs(fe, value, observationsHolder);
             break;
         }
         case Concept.dataType.Time: {
             const value = moment(answerValue, TIME_FORMAT).format(TIME_FORMAT);
-            addOrUpdateObs(isChildFormElement, parentFormElement, fe, value, observationsHolder);
+            addOrUpdateObs(fe, value, observationsHolder);
             break;
         }
         case Concept.dataType.PhoneNumber:
@@ -208,33 +262,34 @@ async function addObservationValue(observationsHolder, concept, fe, row, errors,
                         })
                 })).catch(error => errors.push(`Column: "${concept.name}" Error message: "${error}"`));
                 console.log("s3Urls =>>", s3Urls);
-                addOrUpdateObs(isChildFormElement, parentFormElement, fe, s3Urls, observationsHolder);
+                addOrUpdateObs(fe, s3Urls, observationsHolder);
             } else {
                 const oldValue = observationsHolder.getObservationReadableValue(concept);
                 const {value, error} = await api.uploadToS3(answerValue, oldValue, token);
                 if (error) {
                     errors.push(`Column: "${concept.name}" Error message: "${error}"`)
                 }
-                addOrUpdateObs(isChildFormElement, parentFormElement, fe, value, observationsHolder);
+                addOrUpdateObs(fe, value, observationsHolder);
             }
             break;
         }
         case Concept.dataType.Subject: {
             const token = await getUploadUserToken();
             const {value} = await api.getSubjectOrLocationObsValue(Concept.dataType.Subject, answerValue, fe.uuid, token);
-            addOrUpdateObs(isChildFormElement, parentFormElement, fe, value, observationsHolder);
+            addOrUpdateObs(fe, value, observationsHolder);
             break;
         }
         case Concept.dataType.Location: {
             const token = await getUploadUserToken();
             const {value} = await api.getSubjectOrLocationObsValue(Concept.dataType.Location, answerValue, fe.uuid, token);
-            addOrUpdateObs(isChildFormElement, parentFormElement, fe, value, observationsHolder);
+            addOrUpdateObs(fe, value, observationsHolder);
             break;
         }
         case Concept.dataType.QuestionGroup:
+            updateGroupQuestionObservations(fe, allFormElements, row, observationsHolder, errors);
             break;
         default:
-            addOrUpdateObs(isChildFormElement, parentFormElement, fe, answerValue, observationsHolder);
+            addOrUpdateObs(fe, answerValue, observationsHolder);
             break;
     }
 }

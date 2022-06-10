@@ -13,8 +13,8 @@
     "express": "^4.14.0",
     "lodash": "^4.17.11",
     "moment": "^2.22.2",
-    "openchs-models": "1.16.0",
-    "rules-config": "github:openchs/rules-config#8e1e3d1518e231a00e30d24879a19674f51d0f21",
+    "openchs-models": "1.17.2",
+    "rules-config": "github:openchs/rules-config#2622898c242da48ad3fc5360995f22784b559610",
     "safe-eval": "^0.4.1",
     "uuid": "^7.0.2"
   },

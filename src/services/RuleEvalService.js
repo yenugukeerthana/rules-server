@@ -167,35 +167,60 @@ const runFormElementGroupRule = (formElementGroup, entity) => {
     }
 };
 
+const getTheChildFormElementStatues = (childFormElement, entity) => {
+    const parentFormElement = childFormElement.getParentFormElement();
+    const questionGroupObservations = entity.findObservation(parentFormElement.concept.uuid);
+    const questionGroupObs = questionGroupObservations && questionGroupObservations.getValueWrapper();
+    const size = questionGroupObs ? questionGroupObs.size() : 1;
+    return _.range(size)
+        .map(questionGroupIndex => {
+            const formElementStatus = runFormElementStatusRule(childFormElement, entity, questionGroupIndex);
+            formElementStatus.addQuestionGroupInformation(questionGroupIndex, childFormElement.groupUuid);
+            return formElementStatus;
+        })
+        .filter(fs => !_.isNil(fs))
+        .reduce((all, curr) => all.concat(curr), [])
+};
+
 export const getFormElementsStatuses = (entity, formElementGroup) => {
     if ([entity, formElementGroup].some(_.isEmpty)) return [];
-    const formElementsWithRules = formElementGroup.getFormElements().filter(formElement => !_.isNil(formElement.rule) && !_.isEmpty(_.trim(formElement.rule)));
+    const formElementsWithRules = formElementGroup
+        .getFormElements()
+        .filter(formElement => !_.isNil(formElement.rule) && !_.isEmpty(_.trim(formElement.rule)));
     const formElementStatusAfterGroupRule = runFormElementGroupRule(formElementGroup, entity);
     const visibleFormElementsUUIDs = _.filter(formElementStatusAfterGroupRule, ({visibility}) => visibility === true).map(({uuid}) => uuid);
+    const applicableFormElements = formElementsWithRules
+        .filter((fe) => _.includes(visibleFormElementsUUIDs, fe.uuid));
     if (!_.isEmpty(formElementsWithRules) && !_.isEmpty(visibleFormElementsUUIDs)) {
-        let formElementStatuses = formElementsWithRules
-            .filter(({uuid}) => _.includes(visibleFormElementsUUIDs, uuid))
+        let formElementStatuses = applicableFormElements
             .map(formElement => {
-                try {
-                    const ruleFunc = eval(formElement.rule);
-                    return ruleFunc({
-                        params: {formElement, entity, services},
-                        imports: {rulesConfig, lodash, moment, common}
-                    });
-                } catch (e) {
-                    console.error(
-                        `Rule-Failure for formElement name: ${formElement.name} Error message: ${
-                            e.message
-                        } stack: ${e.stack}`
-                    );
-                    return null;
+                if (formElement.groupUuid) {
+                    return getTheChildFormElementStatues(formElement, entity);
                 }
+                return runFormElementStatusRule(formElement, entity);
             })
             .filter(fs => !_.isNil(fs))
             .reduce((all, curr) => all.concat(curr), formElementStatusAfterGroupRule)
-            .reduce((acc, fs) => acc.set(fs.uuid, fs), new Map())
+            .reduce((acc, fs) => acc.set(`${fs.uuid}-${fs.questionGroupIndex || 0}`, fs), new Map())
             .values();
         return [...formElementStatuses];
     }
-     return formElementStatusAfterGroupRule;
+    return formElementStatusAfterGroupRule;
+};
+
+const runFormElementStatusRule = (formElement, entity, questionGroupIndex) => {
+    try {
+        const ruleFunc = eval(formElement.rule);
+        return ruleFunc({
+            params: {formElement, entity, questionGroupIndex, services},
+            imports: {rulesConfig, common, lodash, moment}
+        });
+    } catch (e) {
+        console.error(
+            `Rule-Failure for formElement name: ${formElement.name} Error message: ${
+                e.message
+            } stack: ${e.stack}`
+        );
+        return null;
+    }
 };
