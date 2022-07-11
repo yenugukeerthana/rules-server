@@ -1,14 +1,16 @@
 import {mapProgramEncounter} from './models/programEncounterModel';
-import {mapEncounter} from './models/encounterModel';
+import {createEncounterType, mapEncounter} from './models/encounterModel';
 import {mapIndividual} from './models/individualModel';
 import {mapProgramEnrolment} from './models/programEnrolmentModel';
 import {
     checkListRule,
     decisionRule,
+    isEligibleForEncounter,
     programSummaryRule,
     subjectSummaryRule,
     visitScheduleRule
 } from './services/RuleEvalService';
+import {map} from 'lodash';
 
 export const transformVisitScheduleDates = (visitSchedules) => {
     visitSchedules.forEach((visitSchedule, index, array) => {
@@ -52,5 +54,12 @@ export const executeSummaryRule = async (requestBody) => {
     return {
         "summaries": await summaryRule[workflowType](requestBody.rule, entity)
     }
+};
+
+export const executeEncounterEligibilityRule = async (requestBody) => {
+    const {individual, encounterTypes} = requestBody;
+    const individualModel = mapIndividual(individual);
+    const eligibilityRuleEntities = await Promise.all(map(encounterTypes, et => isEligibleForEncounter(individualModel, createEncounterType(et))));
+    return {eligibilityRuleEntities};
 };
 

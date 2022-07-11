@@ -6,6 +6,7 @@ import evalRule from "./evalRule";
 import ruleService from "./RuleService";
 import {individualService} from "./IndividualService";
 import {FormElementStatus} from "openchs-models";
+import {createEncounterType} from "../models/encounterModel";
 
 const removeStrictFromRuleCode = (rule) => isNil(rule) ? "" : rule.replace(/"use strict";|'use strict';/ig, '');
 
@@ -123,6 +124,25 @@ export const subjectSummaryRule = async (rule, entity) => {
         return summaries;
     }
     return [];
+};
+
+export const isEligibleForEncounter = async (individual, encounterType) => {
+    let eligible = true;
+    const rulesFromTheBundle = await getAllRuleItemsFor(encounterType.uuid, "EncounterEligibilityCheck", "EncounterType");
+    if (!_.isNil(encounterType.encounterEligibilityCheckRule) && !_.isEmpty(_.trim(encounterType.encounterEligibilityCheckRule))) {
+        const code = removeStrictFromRuleCode(encounterType.encounterEligibilityCheckRule);
+        const ruleFunc = eval(code);
+        eligible = ruleFunc({
+            params: {entity: individual, services},
+            imports: {rulesConfig, lodash, moment}
+        });
+    } else if (!_.isEmpty(rulesFromTheBundle)) {
+        eligible = runRuleAndSaveFailure(_.last(rulesFromTheBundle), 'Encounter', {individual}, true);
+    }
+    return {
+        "isEligible": eligible,
+        "typeUUID": encounterType.uuid,
+    };
 };
 
 const getAllRuleItemsFor = async (entityUuid, type, entityType) => {

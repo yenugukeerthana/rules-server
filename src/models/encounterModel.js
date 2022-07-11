@@ -65,11 +65,14 @@ const mapBasicEncounter = (request) => {
       );
 }
 
-const createEncounterType = (encounterTypeParam) => {
+export const createEncounterType = (encounterTypeParam) => {
     const encounterType = new EncounterType();
     encounterType.uuid = encounterTypeParam.uuid;
     encounterType.name = encounterTypeParam.name;
     encounterType.operationalEncounterTypeName = encounterTypeParam.operationalEncounterTypeName;
     encounterType.displayName = encounterTypeParam.displayName;
+    encounterType.voided = encounterTypeParam.voided;
+    encounterType.encounterEligibilityCheckRule = encounterTypeParam.encounterEligibilityCheckRule;
+    encounterType.active = encounterTypeParam.active;
     return encounterType;
 }
