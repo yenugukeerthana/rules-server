@@ -33,7 +33,6 @@ function mapBasicSubject(individualDetails) {
 }
 
 export const mapIndividual = individualDetails => {
-    console.log("individualDetails =>>", individualDetails);
     const individual = mapBasicSubject(individualDetails);
     individual.latestEntityApprovalStatus = mapEntityApprovalStatus(individualDetails.latestEntityApprovalStatus);
     if (!isNil(individualDetails.encounters)) {
@@ -53,7 +52,6 @@ export const mapIndividual = individualDetails => {
     } else {
         individual.groups = [];
     }
-    console.log("indi =>>", individual);
     return individual;
 };
 
