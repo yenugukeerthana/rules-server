@@ -10,7 +10,7 @@ export const mapProgramEncounter = (request) => {
     const programEncounter = General.assignFields(
         request,
         new ProgramEncounter(),
-        ["uuid", "name"],
+        ["uuid", "name", "voided"],
         ["encounterDateTime", "earliestVisitDateTime", "maxVisitDateTime", "cancelDateTime"]
     );
     programEncounter.encounterType = mapEncounterType(request.encounterType);

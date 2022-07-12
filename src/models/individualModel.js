@@ -9,7 +9,7 @@ function mapBasicSubject(individualDetails) {
     const individual = General.assignFields(
         individualDetails,
         new Individual(),
-        ["uuid", "firstName", "lastName", "profilePicture"],
+        ["uuid", "firstName", "lastName", "profilePicture", "voided"],
         ["registrationDate", "dateOfBirth"]
     );
 
@@ -33,6 +33,7 @@ function mapBasicSubject(individualDetails) {
 }
 
 export const mapIndividual = individualDetails => {
+    console.log("individualDetails =>>", individualDetails);
     const individual = mapBasicSubject(individualDetails);
     individual.latestEntityApprovalStatus = mapEntityApprovalStatus(individualDetails.latestEntityApprovalStatus);
     if (!isNil(individualDetails.encounters)) {
@@ -52,7 +53,7 @@ export const mapIndividual = individualDetails => {
     } else {
         individual.groups = [];
     }
-
+    console.log("indi =>>", individual);
     return individual;
 };
 

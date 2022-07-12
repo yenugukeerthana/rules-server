@@ -11,7 +11,7 @@ export const mapProgramEnrolment = (request) => {
     const programEnrolment = General.assignFields(
         request,
         new ProgramEnrolment(),
-        ["uuid"],
+        ["uuid", "voided"],
         ["enrolmentDateTime", "programExitDateTime"]
     );
     programEnrolment.voided = request.voided;

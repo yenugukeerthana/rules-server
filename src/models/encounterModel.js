@@ -12,7 +12,7 @@ export const mapEncounter = (request) => {
     const encounter = General.assignFields(
         request,
         new Encounter(),
-        ["uuid", "name"],
+        ["uuid", "name", "voided"],
         ["encounterDateTime", "earliestVisitDateTime","maxVisitDateTime","cancelDateTime"]
       );
     encounter.encounterType = createEncounterType(request.encounterType);
