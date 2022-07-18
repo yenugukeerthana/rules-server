@@ -4,7 +4,7 @@ import {
     EncounterType,
     ProgramEnrolment
 } from "openchs-models";
-import { mapObservations } from "./observationModel";
+import {mapObservations} from "./observationModel";
 import {mapIndividual} from "./individualModel";
 import {mapEntityApprovalStatus} from "./entityApprovalStatusModel";
 
@@ -13,57 +13,51 @@ export const mapEncounter = (request) => {
         request,
         new Encounter(),
         ["uuid", "name", "voided"],
-        ["encounterDateTime", "earliestVisitDateTime","maxVisitDateTime","cancelDateTime"]
-      );
+        ["encounterDateTime", "earliestVisitDateTime", "maxVisitDateTime", "cancelDateTime"]
+    );
     encounter.encounterType = createEncounterType(request.encounterType);
-    if(request.observations != undefined){
+    if (request.observations) {
         encounter.observations = mapObservations(request.observations);
     }
-    if(request.cancelObservations != undefined){
+    if (request.cancelObservations) {
         encounter.cancelObservations = mapObservations(request.cancelObservations);
     }
-    if(request.subject != undefined){
+    if (request.subject) {
         encounter.individual = mapIndividual(request.subject);
-        if(request.subject.enrolments != undefined){
-            encounter.individual.enrolments = mapProgramEnrolment(request.subject.enrolments);
-        }
-        if(request.subject.encounters != undefined){
-            encounter.individual.encounters = mapEncounters(request.subject.encounters);
-        }
     }
     encounter.latestEntityApprovalStatus = mapEntityApprovalStatus(request.latestEntityApprovalStatus);
     return encounter;
-}
+};
 
 const mapProgramEnrolment = (request) => {
     return request.map(programEnrolment => {
         return mapBasicProgramEnrolment(programEnrolment);
     });
-}
+};
 
 const mapEncounters = (request) => {
     return request.map(encounter => {
         return mapBasicEncounter(encounter);
     });
-}
+};
 
 const mapBasicProgramEnrolment = (request) => {
     return General.assignFields(
         request,
         new ProgramEnrolment(),
         ["uuid", "voided"],
-        ["encounterDateTime","programExitDateTime","enrolmentDateTime"]
-      );
-}
+        ["encounterDateTime", "programExitDateTime", "enrolmentDateTime"]
+    );
+};
 
 const mapBasicEncounter = (request) => {
     return General.assignFields(
         request,
         new Encounter(),
         ["uuid", "name"],
-        ["encounterDateTime", "earliestVisitDateTime","maxVisitDateTime","cancelDateTime"]
-      );
-}
+        ["encounterDateTime", "earliestVisitDateTime", "maxVisitDateTime", "cancelDateTime"]
+    );
+};
 
 export const createEncounterType = (encounterTypeParam) => {
     const encounterType = new EncounterType();
@@ -75,4 +69,4 @@ export const createEncounterType = (encounterTypeParam) => {
     encounterType.encounterEligibilityCheckRule = encounterTypeParam.encounterEligibilityCheckRule;
     encounterType.active = encounterTypeParam.active;
     return encounterType;
-}
+};

@@ -3,8 +3,8 @@ import {
     ProgramEnrolment,
 } from "openchs-models";
 import {mapObservations} from "./observationModel";
-import { mapIndividual } from "./individualModel";
-import { mapProgramEncounter } from "./programEncounterModel";
+import {mapIndividual} from "./individualModel";
+import {mapProgramEncounter} from "./programEncounterModel";
 import {mapEntityApprovalStatus} from "./entityApprovalStatusModel";
 
 export const mapProgramEnrolment = (request) => {
@@ -15,18 +15,18 @@ export const mapProgramEnrolment = (request) => {
         ["enrolmentDateTime", "programExitDateTime"]
     );
     programEnrolment.voided = request.voided;
-    if(request.observations != undefined){
+    if (request.observations) {
         programEnrolment.observations = mapObservations(request.observations);
     }
-    if(request.exitObservations != undefined){
+    if (request.exitObservations) {
         programEnrolment.programExitObservations = mapObservations(request.exitObservations);
     }
-    if(request.subject != undefined){
+    if (request.subject) {
         programEnrolment.individual = mapIndividual(request.subject);
     }
-    if(request.programEncounters != undefined){
+    if (request.programEncounters) {
         programEnrolment.encounters = request.programEncounters.map(programEncounter => mapProgramEncounter(programEncounter));
     }
     programEnrolment.latestEntityApprovalStatus = mapEntityApprovalStatus(request.latestEntityApprovalStatus);
     return programEnrolment;
-}
+};

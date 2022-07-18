@@ -2,8 +2,8 @@ import {
     ProgramEncounter,
     EncounterType, ModelGeneral as General,
 } from "openchs-models";
-import { mapObservations } from "./observationModel";
-import { mapProgramEnrolment } from "./programEnrolmentModel";
+import {mapObservations} from "./observationModel";
+import {mapProgramEnrolment} from "./programEnrolmentModel";
 import {mapEntityApprovalStatus} from "./entityApprovalStatusModel";
 
 export const mapProgramEncounter = (request) => {
@@ -15,19 +15,19 @@ export const mapProgramEncounter = (request) => {
     );
     programEncounter.encounterType = mapEncounterType(request.encounterType);
     programEncounter.programEnrolment = null;
-    if(request.observations){
+    if (request.observations) {
         programEncounter.observations = mapObservations(request.observations);
         console.log(`programEncounterModel: observations ${JSON.stringify(programEncounter.observations)}`);
     }
-    if(request.cancelObservations){
+    if (request.cancelObservations) {
         programEncounter.cancelObservations = mapObservations(request.cancelObservations);
     }
-    if(request.programEnrolment){
+    if (request.programEnrolment) {
         programEncounter.programEnrolment = mapProgramEnrolment(request.programEnrolment);
     }
     programEncounter.latestEntityApprovalStatus = mapEntityApprovalStatus(request.latestEntityApprovalStatus);
     return programEncounter;
-}
+};
 
 const mapEncounterType = (encounterTypeParam) => {
     const encounterType = new EncounterType();
@@ -36,4 +36,4 @@ const mapEncounterType = (encounterTypeParam) => {
     encounterType.operationalEncounterTypeName = encounterTypeParam.operationalEncounterTypeName;
     encounterType.displayName = encounterTypeParam.displayName;
     return encounterType;
-}
+};
