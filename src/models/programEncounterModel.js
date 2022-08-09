@@ -17,7 +17,6 @@ export const mapProgramEncounter = (request) => {
     programEncounter.programEnrolment = null;
     if (request.observations) {
         programEncounter.observations = mapObservations(request.observations);
-        console.log(`programEncounterModel: observations ${JSON.stringify(programEncounter.observations)}`);
     }
     if (request.cancelObservations) {
         programEncounter.cancelObservations = mapObservations(request.cancelObservations);
