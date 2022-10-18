@@ -1,4 +1,4 @@
-import {executeEncounterEligibilityRule, executeRule, executeSummaryRule} from '../RuleExecutor';
+import {executeEncounterEligibilityRule, executeRule, executeSummaryRule, executeScheduleRule} from '../RuleExecutor';
 import {ORGANISATION_UUID_HEADER, AUTH_TOKEN_HEADER, USER_NAME_HEADER} from "./UserHeaders";
 import axios from "axios";
 import cache from "../services/cache";
@@ -21,6 +21,17 @@ export const summary = async (req, res, next) => {
     try {
         setGlobalAxiosHeaders(req);
         const ruleResponse = await executeSummaryRule(req.body);
+        ruleResponse.status = "success";
+        res.status(200).json(ruleResponse);
+    } catch (err) {
+        catchRuleError(err, res);
+    }
+};
+
+export const schedule = async (req, res, next) => {
+    try {
+        setGlobalAxiosHeaders(req);
+        const ruleResponse = await executeScheduleRule(req.body);
         ruleResponse.status = "success";
         res.status(200).json(ruleResponse);
     } catch (err) {

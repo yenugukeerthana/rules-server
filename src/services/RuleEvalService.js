@@ -145,6 +145,15 @@ export const isEligibleForEncounter = async (individual, encounterType) => {
     };
 };
 
+export const scheduleRule = async (rule, entity) => {
+    const code = removeStrictFromRuleCode(rule);
+    const ruleFunc = eval(code);
+    const scheduledDateTime = ruleFunc({
+        params: {entity}
+    });
+    return scheduledDateTime;
+}
+
 const getAllRuleItemsFor = async (entityUuid, type, entityType) => {
     const applicableRules = RuleRegistry.getRulesFor(entityUuid, type, entityType); //Core module rules
     const additionalRules = await ruleService.getApplicableRules(entityUuid, type, entityType);

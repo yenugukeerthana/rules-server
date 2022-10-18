@@ -8,7 +8,8 @@ import {
     isEligibleForEncounter,
     programSummaryRule,
     subjectSummaryRule,
-    visitScheduleRule
+    visitScheduleRule,
+    scheduleRule
 } from './services/RuleEvalService';
 import {map} from 'lodash';
 
@@ -62,4 +63,11 @@ export const executeEncounterEligibilityRule = async (requestBody) => {
     const eligibilityRuleEntities = await Promise.all(map(encounterTypes, et => isEligibleForEncounter(individualModel, createEncounterType(et))));
     return {eligibilityRuleEntities};
 };
+
+export const executeScheduleRule = async (requestBody) => {
+    const {scheduleRule: rule} = requestBody;
+    const individualModel = mapIndividual(requestBody.entity);
+
+    return await scheduleRule(rule, individualModel);
+}
 
