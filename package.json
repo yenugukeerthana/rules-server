@@ -29,6 +29,7 @@
     "@babel/runtime": "7.4.4",
     "babel-plugin-transform-class-properties": "6.24.1",
     "jest": "^26.4.2",
+    "@jest-mock/express": "^2.0.1",
     "nodemon": "^2.0.2"
   },
   "scripts": {

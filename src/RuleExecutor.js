@@ -65,8 +65,8 @@ export const executeEncounterEligibilityRule = async (requestBody) => {
 };
 
 export const executeScheduleRule = async (requestBody) => {
-    const {scheduleRule: rule} = requestBody;
-    const individualModel = mapIndividual(requestBody.entity);
+    const {entity, scheduleRule: rule} = requestBody;
+    const individualModel = mapIndividual(entity);
 
     return await scheduleRule(rule, individualModel);
 }

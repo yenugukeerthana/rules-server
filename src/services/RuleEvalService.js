@@ -149,7 +149,8 @@ export const scheduleRule = async (rule, entity) => {
     const code = removeStrictFromRuleCode(rule);
     const ruleFunc = eval(code);
     const scheduledDateTime = ruleFunc({
-        params: {entity}
+        params: {entity},
+        imports: {moment, lodash}
     });
     return scheduledDateTime;
 }
