@@ -1,4 +1,9 @@
-import {executeEncounterEligibilityRule, executeRule, executeSummaryRule, executeScheduleRule} from '../RuleExecutor';
+import {
+    executeEncounterEligibilityRule,
+    executeRule,
+    executeSummaryRule,
+    executeMessagingRule,
+} from '../RuleExecutor';
 import {ORGANISATION_UUID_HEADER, AUTH_TOKEN_HEADER, USER_NAME_HEADER} from "./UserHeaders";
 import axios from "axios";
 import cache from "../services/cache";
@@ -6,49 +11,16 @@ import {BuildObservations} from "../observationBuilder/BuildObservations";
 import {setUploadUser} from "../services/AuthService";
 import {get} from 'lodash';
 
-export const rulesController = async (req, res, next) => {
+const delegateTo = (fn) => async (req, res, next) => {
     try {
         setGlobalAxiosHeaders(req);
-        const ruleResponse = await executeRule(req.body);
+        const ruleResponse = await fn(req.body);
         ruleResponse.status = "success";
         res.status(200).json(ruleResponse);
     } catch (err) {
         catchRuleError(err, res);
     }
 }
-
-export const summary = async (req, res, next) => {
-    try {
-        setGlobalAxiosHeaders(req);
-        const ruleResponse = await executeSummaryRule(req.body);
-        ruleResponse.status = "success";
-        res.status(200).json(ruleResponse);
-    } catch (err) {
-        catchRuleError(err, res);
-    }
-};
-
-export const schedule = async (req, res, next) => {
-    try {
-        setGlobalAxiosHeaders(req);
-        const ruleResponse = await executeScheduleRule(req.body);
-        ruleResponse.status = "success";
-        res.status(200).json(ruleResponse);
-    } catch (err) {
-        catchRuleError(err, res);
-    }
-};
-
-export const encounterEligibility = async (req, res, next) => {
-    try {
-        setGlobalAxiosHeaders(req);
-        const ruleResponse = await executeEncounterEligibilityRule(req.body);
-        ruleResponse.status = "success";
-        res.status(200).json(ruleResponse);
-    } catch (err) {
-        catchRuleError(err, res);
-    }
-};
 
 function catchRuleError(err, res) {
     console.log(err);
@@ -96,3 +68,8 @@ export const buildObservationAndRunRules = async (req, res, next) => {
             })
     }
 };
+
+export const rulesController = delegateTo(executeRule);
+export const summary = delegateTo(executeSummaryRule);
+export const messagingResponse = delegateTo(executeMessagingRule);
+export const encounterEligibility = delegateTo(executeEncounterEligibilityRule);

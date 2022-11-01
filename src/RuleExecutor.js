@@ -9,7 +9,7 @@ import {
     programSummaryRule,
     subjectSummaryRule,
     visitScheduleRule,
-    scheduleRule
+    messagingRule
 } from './services/RuleEvalService';
 import {map} from 'lodash';
 
@@ -22,6 +22,7 @@ export const transformVisitScheduleDates = (visitSchedules) => {
 }
 const mappers = {
     "Individual": mapIndividual,
+    "Subject": mapIndividual,
     "ProgramEnrolment": mapProgramEnrolment,
     "ProgramEncounter": mapProgramEncounter,
     "Encounter": mapEncounter,
@@ -64,10 +65,12 @@ export const executeEncounterEligibilityRule = async (requestBody) => {
     return {eligibilityRuleEntities};
 };
 
-export const executeScheduleRule = async (requestBody) => {
-    const {entity, scheduleRule: rule} = requestBody;
-    const individualModel = mapIndividual(entity);
+export const executeMessagingRule = async (requestBody) => {
+    const {entity, rule, entityType} = requestBody;
+    const mapEntity = mappers[entityType];
+    if (!mapEntity)
+        throw new Error("Value of entityType param is invalid");
+    const model = mapEntity(entity);
 
-    return await scheduleRule(rule, individualModel);
+    return await messagingRule(rule, model);
 }
-

@@ -145,14 +145,14 @@ export const isEligibleForEncounter = async (individual, encounterType) => {
     };
 };
 
-export const scheduleRule = async (rule, entity) => {
+export const messagingRule = async (rule, entity) => {
     const code = removeStrictFromRuleCode(rule);
     const ruleFunc = eval(code);
-    const scheduledDateTime = ruleFunc({
+    const response = ruleFunc({
         params: {entity},
         imports: {moment, lodash}
     });
-    return scheduledDateTime;
+    return response;
 }
 
 const getAllRuleItemsFor = async (entityUuid, type, entityType) => {
