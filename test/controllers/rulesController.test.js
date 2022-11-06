@@ -1,4 +1,4 @@
-import {schedule} from "../../src/controllers/rulesController";
+import {messagingResponse} from "../../src/controllers/rulesController";
 import {getMockReq, getMockRes} from "@jest-mock/express";
 
 test('evaluates schedule rule', async () => {
@@ -6,7 +6,7 @@ test('evaluates schedule rule', async () => {
 
     const req = getMockReq({
         body: {
-            scheduleRule: "'use strict'; " +
+            rule: "'use strict'; " +
                 "({params, imports}) => { return {'scheduledDateTime': '2013-02-04 10:35:24' }};",
             entity: {
                 "uuid": "fdbbf07d-31f3-4752-a58e-cd0ef3c74e79",
@@ -59,11 +59,12 @@ test('evaluates schedule rule', async () => {
                 "visitSchedules": null,
                 "latestEntityApprovalStatus": null,
                 "groups": []
-            }
+            },
+            entityType: "Subject"
         }
     });
 
-    await schedule(req, res, next);
+    await messagingResponse(req, res, next);
 
     expect(res.json).toHaveBeenCalledWith(
         expect.objectContaining({"scheduledDateTime": "2013-02-04 10:35:24"}),
