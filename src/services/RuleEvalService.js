@@ -129,8 +129,8 @@ export const subjectSummaryRule = async (rule, entity) => {
 export const isEligibleForEncounter = async (individual, encounterType) => {
     let eligible = true;
     const rulesFromTheBundle = await getAllRuleItemsFor(encounterType.uuid, "EncounterEligibilityCheck", "EncounterType");
-    if (!_.isNil(encounterType.encounterEligibilityCheckRule) && !_.isEmpty(_.trim(encounterType.encounterEligibilityCheckRule))) {
-        const code = removeStrictFromRuleCode(encounterType.encounterEligibilityCheckRule);
+    if (!_.isNil(encounterType.entityEligibilityCheckRule) && !_.isEmpty(_.trim(encounterType.entityEligibilityCheckRule))) {
+        const code = removeStrictFromRuleCode(encounterType.entityEligibilityCheckRule);
         const ruleFunc = eval(code);
         eligible = ruleFunc({
             params: {entity: individual, services},
@@ -142,6 +142,25 @@ export const isEligibleForEncounter = async (individual, encounterType) => {
     return {
         "isEligible": eligible,
         "typeUUID": encounterType.uuid,
+    };
+};
+
+export const isEligibleForProgramEnrolment = async (individual, program) => {
+    let eligible = true;
+    const rulesFromTheBundle = await getAllRuleItemsFor(program.uuid, "EnrolmentEligibilityCheck", "Program");
+    if (!_.isNil(program.entityEligibilityCheckRule) && !_.isEmpty(_.trim(program.entityEligibilityCheckRule))) {
+        const code = removeStrictFromRuleCode(program.entityEligibilityCheckRule);
+        const ruleFunc = eval(code);
+        eligible = ruleFunc({
+            params: {entity: individual, services},
+            imports: {rulesConfig, lodash, moment}
+        });
+    } else if (!_.isEmpty(rulesFromTheBundle)) {
+        eligible = runRuleAndSaveFailure(_.last(rulesFromTheBundle), 'Program', {individual}, true);
+    }
+    return {
+        "isEligible": eligible,
+        "typeUUID": program.uuid,
     };
 };
 

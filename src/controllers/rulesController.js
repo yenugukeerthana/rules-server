@@ -1,5 +1,5 @@
 import {
-    executeEncounterEligibilityRule,
+    executeEligibilityCheckRule,
     executeRule,
     executeSummaryRule,
     executeMessagingRule,
@@ -72,4 +72,4 @@ export const buildObservationAndRunRules = async (req, res, next) => {
 export const rulesController = delegateTo(executeRule);
 export const summary = delegateTo(executeSummaryRule);
 export const messagingResponse = delegateTo(executeMessagingRule);
-export const encounterEligibility = delegateTo(executeEncounterEligibilityRule);
+export const encounterEligibility = delegateTo(executeEligibilityCheckRule);

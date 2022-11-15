@@ -2,6 +2,7 @@ import {mapProgramEncounter} from './models/programEncounterModel';
 import {createEncounterType, mapEncounter} from './models/encounterModel';
 import {mapIndividual} from './models/individualModel';
 import {mapProgramEnrolment} from './models/programEnrolmentModel';
+import {createProgram} from "./models/programModel";
 import {
     checkListRule,
     decisionRule,
@@ -9,7 +10,7 @@ import {
     programSummaryRule,
     subjectSummaryRule,
     visitScheduleRule,
-    messagingRule
+    messagingRule, isEligibleForProgramEnrolment
 } from './services/RuleEvalService';
 import {map} from 'lodash';
 
@@ -35,6 +36,16 @@ const summaryRule = {
     "SubjectSummary": subjectSummaryRule,
 };
 
+const createTypeMapper = {
+    "EncounterType": createEncounterType,
+    "Program": createProgram
+}
+
+const eligibilityCheckMapper = {
+    "EncounterType": isEligibleForEncounter,
+    "Program": isEligibleForProgramEnrolment
+}
+
 export const executeRule = async (requestBody) => {
     const mapEntity = mappers[requestBody.rule.workFlowType];
     if (!mapEntity)
@@ -58,10 +69,10 @@ export const executeSummaryRule = async (requestBody) => {
     }
 };
 
-export const executeEncounterEligibilityRule = async (requestBody) => {
-    const {individual, encounterTypes} = requestBody;
+export const executeEligibilityCheckRule = async (requestBody) => {
+    const {individual, entityTypes, ruleEntityType} = requestBody;
     const individualModel = mapIndividual(individual);
-    const eligibilityRuleEntities = await Promise.all(map(encounterTypes, et => isEligibleForEncounter(individualModel, createEncounterType(et))));
+    const eligibilityRuleEntities = await Promise.all(map(entityTypes, et => eligibilityCheckMapper[ruleEntityType](individualModel, createTypeMapper[ruleEntityType](et))));
     return {eligibilityRuleEntities};
 };
 

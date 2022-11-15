@@ -66,7 +66,7 @@ export const createEncounterType = (encounterTypeParam) => {
     encounterType.operationalEncounterTypeName = encounterTypeParam.operationalEncounterTypeName;
     encounterType.displayName = encounterTypeParam.displayName;
     encounterType.voided = encounterTypeParam.voided;
-    encounterType.encounterEligibilityCheckRule = encounterTypeParam.encounterEligibilityCheckRule;
+    encounterType.entityEligibilityCheckRule = encounterTypeParam.entityEligibilityCheckRule;
     encounterType.active = encounterTypeParam.active;
     return encounterType;
 };
