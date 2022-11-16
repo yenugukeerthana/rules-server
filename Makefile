@@ -1,18 +1,14 @@
-check-node-v:
-ifneq ($(shell node -v),$(shell cat .nvmrc))
-	@echo -e '\nPlease run `nvm use` in your terminal to change node version\n'
-	@exit 1
-endif
-	@node -v
+set-node-version:
+	. ${NVM_DIR}/nvm.sh && nvm use
 
 clean:
 	rm -rf node_modules
 
-deps: check-node-v
+deps: set-node-version
 	npm install
 
-start: check-node-v
+start: set-node-version
 	npm start
 
-test: check-node-v
+test: set-node-version
 	npm test

@@ -4,21 +4,21 @@
   "description": "Avni Node Server. Used to do server side evaluation of rules",
   "main": "index.js",
   "dependencies": {
-    "@babel/polyfill": "^7.8.7",
-    "avni-health-modules": "0.0.9",
     "aws-amplify": "^4.3.14",
     "axios": "^0.21.0",
-    "babel-plugin-module-resolver": "^3.2.0",
     "body-parser": "^1.19.0",
     "express": "^4.14.0",
-    "lodash": "^4.17.11",
-    "moment": "^2.22.2",
-    "openchs-models": "1.17.2",
-    "rules-config": "github:openchs/rules-config#2622898c242da48ad3fc5360995f22784b559610",
     "safe-eval": "^0.4.1",
-    "uuid": "^7.0.2"
+    "uuid": "^7.0.2",
+    "avni-health-modules": "0.0.18",
+    "openchs-models": "1.27.8",
+    "rules-config": "github:openchs/rules-config#a35ade353300f8dde3a20af4234b49036e2fda16",
+    "lodash": "^4.17.11",
+    "moment": "^2.22.2"
   },
   "devDependencies": {
+    "@babel/polyfill": "^7.8.7",
+    "babel-plugin-module-resolver": "^3.2.0",
     "@babel/core": "7.4.4",
     "@babel/plugin-proposal-class-properties": "7.4.4",
     "@babel/plugin-proposal-decorators": "7.4.4",
@@ -30,7 +30,8 @@
     "babel-plugin-transform-class-properties": "6.24.1",
     "jest": "^26.4.2",
     "@jest-mock/express": "^2.0.1",
-    "nodemon": "^2.0.2"
+    "nodemon": "^2.0.2",
+    "chai": "^4.2.0"
   },
   "scripts": {
     "start": "nodemon app.js",
