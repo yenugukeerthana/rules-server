@@ -6,11 +6,11 @@ import {createProgram} from "./models/programModel";
 import {
     checkListRule,
     decisionRule,
-    isEligibleForEncounter,
     programSummaryRule,
     subjectSummaryRule,
     visitScheduleRule,
-    messagingRule, isEligibleForProgramEnrolment
+    messagingRule,
+    isEligibleForEntityType
 } from './services/RuleEvalService';
 import {map} from 'lodash';
 
@@ -41,9 +41,15 @@ const createTypeMapper = {
     "Program": createProgram
 }
 
-const eligibilityCheckMapper = {
-    "EncounterType": isEligibleForEncounter,
-    "Program": isEligibleForProgramEnrolment
+const bundleEligibilityCheckRuleParamsMapper = {
+    "EncounterType": {
+        ruleType: "EncounterEligibilityCheck",
+        entityName: "Encounter"
+    },
+    "Program": {
+        ruleType: "EnrolmentEligibilityCheck",
+        entityName: "Program"
+    }
 }
 
 export const executeRule = async (requestBody) => {
@@ -72,7 +78,7 @@ export const executeSummaryRule = async (requestBody) => {
 export const executeEligibilityCheckRule = async (requestBody) => {
     const {individual, entityTypes, ruleEntityType} = requestBody;
     const individualModel = mapIndividual(individual);
-    const eligibilityRuleEntities = await Promise.all(map(entityTypes, et => eligibilityCheckMapper[ruleEntityType](individualModel, createTypeMapper[ruleEntityType](et))));
+    const eligibilityRuleEntities = await Promise.all(map(entityTypes, et => isEligibleForEntityType(individualModel, createTypeMapper[ruleEntityType](et), bundleEligibilityCheckRuleParamsMapper[ruleEntityType])));
     return {eligibilityRuleEntities};
 };
 

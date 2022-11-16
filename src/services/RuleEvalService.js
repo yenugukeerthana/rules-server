@@ -126,41 +126,22 @@ export const subjectSummaryRule = async (rule, entity) => {
     return [];
 };
 
-export const isEligibleForEncounter = async (individual, encounterType) => {
+export const isEligibleForEntityType = async (individual, entityType, bundleRuleParams) => {
     let eligible = true;
-    const rulesFromTheBundle = await getAllRuleItemsFor(encounterType.uuid, "EncounterEligibilityCheck", "EncounterType");
-    if (!_.isNil(encounterType.entityEligibilityCheckRule) && !_.isEmpty(_.trim(encounterType.entityEligibilityCheckRule))) {
-        const code = removeStrictFromRuleCode(encounterType.entityEligibilityCheckRule);
+    const rulesFromTheBundle = await getAllRuleItemsFor(entityType.uuid, bundleRuleParams.ruleType, entityType);
+    if (!_.isNil(entityType.entityEligibilityCheckRule) && !_.isEmpty(_.trim(entityType.entityEligibilityCheckRule))) {
+        const code = removeStrictFromRuleCode(entityType.entityEligibilityCheckRule);
         const ruleFunc = eval(code);
         eligible = ruleFunc({
             params: {entity: individual, services},
             imports: {rulesConfig, lodash, moment}
         });
     } else if (!_.isEmpty(rulesFromTheBundle)) {
-        eligible = runRuleAndSaveFailure(_.last(rulesFromTheBundle), 'Encounter', {individual}, true);
+        eligible = runRuleAndSaveFailure(_.last(rulesFromTheBundle), bundleRuleParams.entityName, {individual}, true);
     }
     return {
         "isEligible": eligible,
-        "typeUUID": encounterType.uuid,
-    };
-};
-
-export const isEligibleForProgramEnrolment = async (individual, program) => {
-    let eligible = true;
-    const rulesFromTheBundle = await getAllRuleItemsFor(program.uuid, "EnrolmentEligibilityCheck", "Program");
-    if (!_.isNil(program.entityEligibilityCheckRule) && !_.isEmpty(_.trim(program.entityEligibilityCheckRule))) {
-        const code = removeStrictFromRuleCode(program.entityEligibilityCheckRule);
-        const ruleFunc = eval(code);
-        eligible = ruleFunc({
-            params: {entity: individual, services},
-            imports: {rulesConfig, lodash, moment}
-        });
-    } else if (!_.isEmpty(rulesFromTheBundle)) {
-        eligible = runRuleAndSaveFailure(_.last(rulesFromTheBundle), 'Program', {individual}, true);
-    }
-    return {
-        "isEligible": eligible,
-        "typeUUID": program.uuid,
+        "typeUUID": entityType.uuid,
     };
 };
 
