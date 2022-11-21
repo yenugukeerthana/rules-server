@@ -10,8 +10,8 @@
     "express": "^4.14.0",
     "safe-eval": "^0.4.1",
     "uuid": "^7.0.2",
-    "avni-health-modules": "0.0.18",
-    "openchs-models": "1.27.8",
+    "avni-health-modules": "latest",
+    "openchs-models": "latest",
     "rules-config": "github:openchs/rules-config#a35ade353300f8dde3a20af4234b49036e2fda16",
     "lodash": "^4.17.11",
     "moment": "^2.22.2"
