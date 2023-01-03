@@ -15,6 +15,7 @@ commands:
           command: |
             sudo apt-get -y -qq update
             sudo apt-get -y -qq install make openssl python3-pip
+            sudo apt-get install unzip
             sudo pip3 install awscli --upgrade
 
       - run:
@@ -29,8 +30,8 @@ commands:
             sudo rm -rf /opt/rules-server
             sudo unzip -qq /tmp/rules-server.zip -d /opt/
             cd /opt/rules-server
-            chmod a+x /opt/rules-server/deploy/install.sh
-            sudo ./deploy/install.sh $OPENCHS_UPLOAD_USER_USER_NAME $OPENCHS_UPLOAD_USER_PASSWORD
+            sudo chmod a+x /opt/rules-server/deploy/install.sh
+            sudo /opt/rules-server/deploy/install.sh $OPENCHS_UPLOAD_USER_USER_NAME $OPENCHS_UPLOAD_USER_PASSWORD
             sudo rm -rf /tmp/rules-server.zip
             EOF
 
