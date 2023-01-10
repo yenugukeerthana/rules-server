@@ -32,6 +32,7 @@ commands:
             chmod a+x /opt/rules-server/deploy/install.sh
             sudo ./deploy/install.sh $OPENCHS_UPLOAD_USER_USER_NAME $OPENCHS_UPLOAD_USER_PASSWORD
             sudo rm -rf /tmp/rules-server.zip
+            pm2 reload
             EOF
 
 jobs:
