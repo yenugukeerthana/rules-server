@@ -12,7 +12,7 @@
     "uuid": "^7.0.2",
     "avni-health-modules": "latest",
     "openchs-models": "latest",
-    "rules-config": "github:openchs/rules-config#a35ade353300f8dde3a20af4234b49036e2fda16",
+    "rules-config": "github:openchs/rules-config#cbf1307fb9b3ae12c44256e283d9796bd2cd334c",
     "lodash": "^4.17.11",
     "moment": "^2.22.2"
   },
