@@ -9,6 +9,7 @@ deps: set-node-version
 
 start: set-node-version
 	npm start
+	#ENV='UTC' npm start
 
 test: set-node-version
 	npm test
