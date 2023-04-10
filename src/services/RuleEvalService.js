@@ -10,10 +10,14 @@ import {createEncounterType} from "../models/encounterModel";
 
 const removeStrictFromRuleCode = (rule) => isNil(rule) ? "" : rule.replace(/"use strict";|'use strict';/ig, '');
 
-const trimDecisionsMap = (decisionsMap) => {
+function isEmptyValues(value) {
+    return value === undefined || value === null || (typeof value === 'object' && Object.keys(value).length === 0 )|| (typeof value === 'string' && value.trim().length === 0);
+}
+
+export const trimDecisionsMap = (decisionsMap) => {
     const trimmedDecisions = {};
     forEach(decisionsMap, (decisions, decisionType) => {
-        trimmedDecisions[decisionType] = reject(reject(decisions, isEmpty), (d) => isEmpty(d.value));
+        trimmedDecisions[decisionType] = reject(reject(decisions, isEmpty), (d) => isEmptyValues(d.value));
     });
     return trimmedDecisions;
 };
