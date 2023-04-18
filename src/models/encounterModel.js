@@ -6,7 +6,7 @@ import {
 } from "openchs-models";
 import {mapObservations} from "./observationModel";
 import {mapIndividual} from "./individualModel";
-import {mapEntityApprovalStatus} from "./entityApprovalStatusModel";
+import {mapEntityApprovalStatuses} from "./entityApprovalStatusModel";
 
 export const mapEncounter = (request) => {
     const encounter = General.assignFields(
@@ -15,7 +15,7 @@ export const mapEncounter = (request) => {
         ["uuid", "name", "voided"],
         ["encounterDateTime", "earliestVisitDateTime", "maxVisitDateTime", "cancelDateTime"]
     );
-    encounter.approvalStatuses = request.entityApprovalStatuses;
+    encounter.approvalStatuses = mapEntityApprovalStatuses(request.entityApprovalStatuses);
     encounter.encounterType = createEncounterType(request.encounterType);
     if (request.observations) {
         encounter.observations = mapObservations(request.observations);

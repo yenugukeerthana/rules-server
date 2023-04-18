@@ -5,7 +5,11 @@ import {
 } from "openchs-models";
 import {isNil} from 'lodash';
 
-export const mapEntityApprovalStatus = (resource) => {
+export function mapEntityApprovalStatuses(list) {
+    return isNil(list) ? [] : list.map((x) => mapEntityApprovalStatus(x));
+}
+
+function mapEntityApprovalStatus(resource) {
     if (isNil(resource)) {
         return null;
     }
@@ -14,9 +18,9 @@ export const mapEntityApprovalStatus = (resource) => {
         ["statusDateTime"]);
     entityApprovalStatus.approvalStatus = mapApprovalStatus(resource.approvalStatus);
     return entityApprovalStatus;
-};
+}
 
-const mapApprovalStatus = (resource) => {
+function mapApprovalStatus(resource) {
     return General.assignFields(resource, new ApprovalStatus(),
         ["uuid", "status", "voided"]);
-};
+}

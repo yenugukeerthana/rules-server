@@ -1,6 +1,7 @@
 import {EncounterType, ModelGeneral as General, ProgramEncounter,} from "openchs-models";
 import {mapObservations} from "./observationModel";
 import {mapProgramEnrolment} from "./programEnrolmentModel";
+import {mapEntityApprovalStatuses} from "./entityApprovalStatusModel";
 
 export const mapProgramEncounter = (request) => {
     const programEncounter = General.assignFields(
@@ -9,7 +10,7 @@ export const mapProgramEncounter = (request) => {
         ["uuid", "name", "voided"],
         ["encounterDateTime", "earliestVisitDateTime", "maxVisitDateTime", "cancelDateTime"]
     );
-    programEncounter.approvalStatuses = request.entityApprovalStatuses;
+    programEncounter.approvalStatuses = mapEntityApprovalStatuses(request.entityApprovalStatuses)
     programEncounter.encounterType = mapEncounterType(request.encounterType);
     programEncounter.programEnrolment = null;
     if (request.observations) {

@@ -1,7 +1,7 @@
 import {AddressLevel, Gender, GroupSubject, Individual, ModelGeneral as General, SubjectType, GroupRole} from "openchs-models";
 import {mapObservations} from "./observationModel";
 import {mapEncounter} from "./encounterModel";
-import {mapEntityApprovalStatus} from "./entityApprovalStatusModel";
+import {mapEntityApprovalStatuses} from "./entityApprovalStatusModel";
 import {isNil, map} from 'lodash';
 import {mapProgramEnrolment} from "./programEnrolmentModel";
 
@@ -34,7 +34,7 @@ function mapBasicSubject(individualDetails) {
 
 export const mapIndividual = individualDetails => {
     const individual = mapBasicSubject(individualDetails);
-    individual.approvalStatuses = individualDetails.entityApprovalStatuses;
+    individual.approvalStatuses = mapEntityApprovalStatuses(individualDetails.entityApprovalStatuses);
     if (!isNil(individualDetails.encounters)) {
         individual.encounters = map(individualDetails.encounters, encounter => mapEncounter(encounter))
     } else {

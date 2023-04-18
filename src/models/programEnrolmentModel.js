@@ -5,7 +5,7 @@ import {
 import {mapObservations} from "./observationModel";
 import {mapIndividual} from "./individualModel";
 import {mapProgramEncounter} from "./programEncounterModel";
-import {mapEntityApprovalStatus} from "./entityApprovalStatusModel";
+import {mapEntityApprovalStatuses} from "./entityApprovalStatusModel";
 
 export const mapProgramEnrolment = (request) => {
     const programEnrolment = General.assignFields(
@@ -14,7 +14,7 @@ export const mapProgramEnrolment = (request) => {
         ["uuid", "voided"],
         ["enrolmentDateTime", "programExitDateTime"]
     );
-    programEnrolment.approvalStatuses = request.entityApprovalStatuses;
+    programEnrolment.approvalStatuses = mapEntityApprovalStatuses(request.entityApprovalStatuses);
     programEnrolment.voided = request.voided;
     if (request.observations) {
         programEnrolment.observations = mapObservations(request.observations);
