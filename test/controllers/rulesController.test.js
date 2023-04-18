@@ -57,7 +57,6 @@ test('evaluates schedule rule', async () => {
                 "enrolments": [],
                 "encounters": [],
                 "visitSchedules": null,
-                "latestEntityApprovalStatus": null,
                 "groups": []
             },
             entityType: "Subject"

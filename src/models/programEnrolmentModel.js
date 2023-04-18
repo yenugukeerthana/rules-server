@@ -14,6 +14,7 @@ export const mapProgramEnrolment = (request) => {
         ["uuid", "voided"],
         ["enrolmentDateTime", "programExitDateTime"]
     );
+    programEnrolment.approvalStatuses = request.entityApprovalStatuses;
     programEnrolment.voided = request.voided;
     if (request.observations) {
         programEnrolment.observations = mapObservations(request.observations);
@@ -27,6 +28,5 @@ export const mapProgramEnrolment = (request) => {
     if (request.programEncounters) {
         programEnrolment.encounters = request.programEncounters.map(programEncounter => mapProgramEncounter(programEncounter));
     }
-    programEnrolment.latestEntityApprovalStatus = mapEntityApprovalStatus(request.latestEntityApprovalStatus);
     return programEnrolment;
 };

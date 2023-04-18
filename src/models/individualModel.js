@@ -34,7 +34,7 @@ function mapBasicSubject(individualDetails) {
 
 export const mapIndividual = individualDetails => {
     const individual = mapBasicSubject(individualDetails);
-    individual.latestEntityApprovalStatus = mapEntityApprovalStatus(individualDetails.latestEntityApprovalStatus);
+    individual.approvalStatuses = individualDetails.entityApprovalStatuses;
     if (!isNil(individualDetails.encounters)) {
         individual.encounters = map(individualDetails.encounters, encounter => mapEncounter(encounter))
     } else {

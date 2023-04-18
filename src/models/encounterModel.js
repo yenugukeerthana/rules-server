@@ -15,6 +15,7 @@ export const mapEncounter = (request) => {
         ["uuid", "name", "voided"],
         ["encounterDateTime", "earliestVisitDateTime", "maxVisitDateTime", "cancelDateTime"]
     );
+    encounter.approvalStatuses = request.entityApprovalStatuses;
     encounter.encounterType = createEncounterType(request.encounterType);
     if (request.observations) {
         encounter.observations = mapObservations(request.observations);
@@ -25,7 +26,6 @@ export const mapEncounter = (request) => {
     if (request.subject) {
         encounter.individual = mapIndividual(request.subject);
     }
-    encounter.latestEntityApprovalStatus = mapEntityApprovalStatus(request.latestEntityApprovalStatus);
     return encounter;
 };
 
