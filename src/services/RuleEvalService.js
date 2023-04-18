@@ -26,6 +26,10 @@ const services = {
     individualService,
 };
 
+function getImports() {
+    return {rulesConfig, common, lodash, moment, motherCalculations, log: console.log};
+}
+
 export const decisionRule = async (rule, entity) => {
     const defaultDecisions = {
         "enrolmentDecisions": [],
@@ -39,7 +43,7 @@ export const decisionRule = async (rule, entity) => {
         const ruleFunc = evalRule(code);
         const ruleDecisions = ruleFunc({
             params: {decisions: defaultDecisions, entity, common, motherCalculations, services},
-            imports: {rulesConfig, lodash, moment}
+            imports: getImports()
         });
         const trimmedDecisions = trimDecisionsMap(ruleDecisions);
         return trimmedDecisions;
@@ -62,7 +66,7 @@ export const visitScheduleRule = async (rule, entity, scheduledVisits) => {
         const ruleFunc = evalRule(code);
         const nextVisits = ruleFunc({
             params: {visitSchedule: scheduledVisits, entity, common, motherCalculations, services},
-            imports: {rulesConfig, lodash, moment}
+            imports: getImports()
         });
         return nextVisits;
     } else if (!isEmpty(rulesFromTheBundle)) {
@@ -86,7 +90,7 @@ export const checkListRule = async (rule, entity, checklistDetails) => {
         const ruleFunc = evalRule(code);
         const checklists = ruleFunc({
             params: {checklistDetails: checklistDetails, entity, common, motherCalculations, services},
-            imports: {rulesConfig, lodash, moment}
+            imports: getImports()
         });
 
         return checklists;
@@ -106,7 +110,7 @@ export const programSummaryRule = async (rule, entity) => {
         const ruleFunc = evalRule(code);
         let summaries = ruleFunc({
             params: {summaries: [], programEnrolment: entity, services},
-            imports: {rulesConfig, lodash, moment}
+            imports: getImports()
         });
         return summaries;
     } else if (!isEmpty(rulesFromTheBundle)) {
@@ -123,7 +127,7 @@ export const subjectSummaryRule = async (rule, entity) => {
         const ruleFunc = evalRule(code);
         let summaries = ruleFunc({
             params: {summaries: [], individual: entity, services},
-            imports: {rulesConfig, lodash, moment}
+            imports: getImports()
         });
         return summaries;
     }
@@ -138,7 +142,7 @@ export const isEligibleForEntityType = async (individual, entityType, bundleRule
         const ruleFunc = eval(code);
         eligible = ruleFunc({
             params: {entity: individual, services},
-            imports: {rulesConfig, lodash, moment}
+            imports: getImports()
         });
     } else if (!_.isEmpty(rulesFromTheBundle)) {
         eligible = runRuleAndSaveFailure(_.last(rulesFromTheBundle), bundleRuleParams.entityName, {individual}, true);
@@ -154,7 +158,7 @@ export const messagingRule = async (rule, entity) => {
     const ruleFunc = eval(code);
     const response = ruleFunc({
         params: {entity},
-        imports: {moment, lodash}
+        imports: getImports()
     });
     return response;
 }
@@ -192,7 +196,7 @@ const runFormElementGroupRule = (formElementGroup, entity) => {
         const ruleFunc = eval(formElementGroup.rule);
         return ruleFunc({
             params: {formElementGroup, entity, services},
-            imports: {rulesConfig, lodash, moment, common}
+            imports: getImports()
         });
     } catch (e) {
         console.error(
@@ -247,7 +251,7 @@ const runFormElementStatusRule = (formElement, entity, questionGroupIndex) => {
         const ruleFunc = eval(formElement.rule);
         return ruleFunc({
             params: {formElement, entity, questionGroupIndex, services},
-            imports: {rulesConfig, common, lodash, moment}
+            imports: getImports()
         });
     } catch (e) {
         console.error(
