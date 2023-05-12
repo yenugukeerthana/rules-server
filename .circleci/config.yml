@@ -13,8 +13,6 @@ commands:
       - run:
           name: Install dependencies and deploy to server
           command: |
-            echo "deb http://security.debian.org/debian-security bullseye-security main contrib non-free" > /etc/apt/sources.list
-
             sudo apt-get -y -qq update
             sudo apt-get -y -qq install make openssl python3-pip
             sudo apt-get install unzip
