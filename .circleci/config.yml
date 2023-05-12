@@ -38,7 +38,7 @@ commands:
 jobs:
   app_test:
     docker:
-      - image: circleci/node:10.15.1
+      - image: cimg/node:10.15.1
 
     working_directory: ~/rules-server
 
@@ -62,7 +62,7 @@ jobs:
 
   app_build:
     docker:
-      - image: circleci/node:10.15.1
+      - image: cimg/node:10.15.1
 
     working_directory: ~/rules-server
 
@@ -101,28 +101,28 @@ jobs:
 
   STAGING_deploy:
     docker:
-      - image: circleci/node:10.24.1
+      - image: cimg/node:10.24.1
     working_directory: ~/
     steps:
       - deploy:
           hostname: "ssh.staging.openchs.org"
   PRERELEASE_deploy:
     docker:
-      - image: circleci/node:10.24.1
+      - image: cimg/node:10.24.1
     working_directory: ~/
     steps:
       - deploy:
           hostname: "ssh.prerelease.openchs.org"
   PERF_deploy:
     docker:
-      - image: circleci/node:10.24.1
+      - image: cimg/node:10.24.1
     working_directory: ~/
     steps:
       - deploy:
           hostname: "ssh.perf.openchs.org"
   PRODUCTION_deploy:
     docker:
-      - image: circleci/node:10.24.1
+      - image: cimg/node:10.24.1
     working_directory: ~/
     steps:
       - deploy:
