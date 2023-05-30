@@ -137,6 +137,7 @@ workflows:
           requires:
             - app_test
       - STAGING_deploy:
+          context: non-prod-deploy
           filters:
             branches:
               only:
@@ -149,6 +150,7 @@ workflows:
           requires:
             - app_build
       - PRODUCTION_deploy:
+          context: prod-deploy
           requires:
             - PRODUCTION_approve
       - PRERELEASE_approve:
@@ -156,6 +158,7 @@ workflows:
           requires:
             - app_build
       - PRERELEASE_deploy:
+          context: non-prod-deploy
           requires:
             - PRERELEASE_approve
       - PERF_approve:
@@ -163,6 +166,7 @@ workflows:
           requires:
             - app_build
       - PERF_deploy:
+          context: non-prod-deploy
           requires:
             - PERF_approve
 notify:
