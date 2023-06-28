@@ -34,7 +34,36 @@ const mapObservation = (observationJson) => {
         const observation = new Observation();
         const concept = mapConcept(observationJson.concept);
         observation.concept = concept;
+        if(concept.datatype === 'QuestionGroup') {
+            let isRepeatable = _.isArray(_.get(observationJson, 'value[0]', null));
+            if(!isRepeatable) {
+                let groupObservationObject =  constructQuestionGroupObservation(observationJson.value);
+                delete observationJson.value;
+                observationJson.value = groupObservationObject;
+            }
+            else {
+                let repeatableObservations = [];
+                _.forEach(observationJson.value, (observation) => {
+                    let repeatableObservation = constructQuestionGroupObservation(observation);
+                    repeatableObservations.push(repeatableObservation);
+                });
+
+                delete observationJson.value;
+                observationJson.value = {repeatableObservations: repeatableObservations};
+            }
+        }
+        
         observation.valueJSON = JSON.stringify(concept.getValueWrapperFor(observationJson.value));
         return observation;
     }
 };
+
+const constructQuestionGroupObservation = (groupObservations) => {
+    const questionGroupObservations = _.map(groupObservations, (groupObservation) => {
+        groupObservation.valueJSON = {value: groupObservation.value};
+        delete groupObservation.value;
+        return groupObservation;
+    });
+
+    return {groupObservations: questionGroupObservations};
+}
