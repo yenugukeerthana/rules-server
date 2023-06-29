@@ -30,40 +30,47 @@ const mapConcept = (concept) => {
 };
 
 const mapObservation = (observationJson) => {
+    function mapQuestionGroupObservation(concept) {
+        const constructQuestionGroupObservation = (groupObservations) => {
+            const questionGroupObservations = _.map(groupObservations, (groupObservation) => {
+                groupObservation.valueJSON = {value: groupObservation.value};
+                delete groupObservation.value;
+                return groupObservation;
+            });
+
+            return {groupObservations: questionGroupObservations};
+        }
+
+        function mapNonRepeatableQuestionGroupObservation() {
+            let groupObservationObject = constructQuestionGroupObservation(observationJson.value);
+            delete observationJson.value;
+            observationJson.value = groupObservationObject;
+        }
+
+        function mapRepeatableQuestionGroupObservation() {
+            let repeatableObservations = [];
+            _.forEach(observationJson.value, (observation) => {
+                let groupObservationObject = constructQuestionGroupObservation(observation);
+                repeatableObservations.push(groupObservationObject);
+            });
+
+            delete observationJson.value;
+            observationJson.value = {repeatableObservations: repeatableObservations};
+        }
+
+        if (concept.datatype.isQuestionGroup()) {
+            let isRepeatable = _.isArray(_.get(observationJson, 'value[0]', null));
+            isRepeatable ? mapRepeatableQuestionGroupObservation() : mapNonRepeatableQuestionGroupObservation();
+        }
+    }
+
     if (observationJson) {
         const observation = new Observation();
         const concept = mapConcept(observationJson.concept);
         observation.concept = concept;
-        if(concept.datatype === 'QuestionGroup') {
-            let isRepeatable = _.isArray(_.get(observationJson, 'value[0]', null));
-            if(!isRepeatable) {
-                let groupObservationObject =  constructQuestionGroupObservation(observationJson.value);
-                delete observationJson.value;
-                observationJson.value = groupObservationObject;
-            }
-            else {
-                let repeatableObservations = [];
-                _.forEach(observationJson.value, (observation) => {
-                    let repeatableObservation = constructQuestionGroupObservation(observation);
-                    repeatableObservations.push(repeatableObservation);
-                });
-
-                delete observationJson.value;
-                observationJson.value = {repeatableObservations: repeatableObservations};
-            }
-        }
+        mapQuestionGroupObservation(concept);
         
         observation.valueJSON = JSON.stringify(concept.getValueWrapperFor(observationJson.value));
         return observation;
     }
 };
-
-const constructQuestionGroupObservation = (groupObservations) => {
-    const questionGroupObservations = _.map(groupObservations, (groupObservation) => {
-        groupObservation.valueJSON = {value: groupObservation.value};
-        delete groupObservation.value;
-        return groupObservation;
-    });
-
-    return {groupObservations: questionGroupObservations};
-}
