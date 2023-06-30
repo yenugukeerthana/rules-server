@@ -58,7 +58,7 @@ const mapObservation = (observationJson) => {
             observationJson.value = {repeatableObservations: repeatableObservations};
         }
 
-        if (concept.datatype.isQuestionGroup()) {
+        if (concept.isQuestionGroup()) {
             let isRepeatable = _.isArray(_.get(observationJson, 'value[0]', null));
             isRepeatable ? mapRepeatableQuestionGroupObservation() : mapNonRepeatableQuestionGroupObservation();
         }
