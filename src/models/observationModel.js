@@ -4,6 +4,7 @@ import {
     Concept,
     ConceptAnswer
 } from "openchs-models";
+import _ from "lodash"
 
 export const mapObservations = (objservationList) => {
     if (objservationList) {
