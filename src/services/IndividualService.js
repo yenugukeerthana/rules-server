@@ -12,6 +12,10 @@ class IndividualService {
            .then(subjects => map(subjects, subject => mapIndividual(subject)));
     }
 
+    getSubjectByUUID(uuid) {
+        return api.getSubjectByUUID(uuid);
+    }
+
 }
 
 export const individualService = new IndividualService();

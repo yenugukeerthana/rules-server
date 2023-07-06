@@ -18,6 +18,10 @@ export default {
         axios
             .get(BASE_URL + `/subject/search?addressLevelUUID=${addressLevelUUID}&subjectTypeName=${subjectTypeName}`)
             .then(response => get(response, 'data')),
+    getSubjectByUUID: (uuid) =>
+        axios
+            .get(BASE_URL + `/web/individual/${uuid}`)
+            .then(response => get(response, 'data')),
     getCognitoDetails: () => axios.get(`${BASE_URL}/cognito-details`, {
         headers: {
             "AUTH-TOKEN": "",
