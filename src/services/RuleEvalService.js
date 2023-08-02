@@ -6,7 +6,6 @@ import evalRule from "./evalRule";
 import ruleService from "./RuleService";
 import {individualService} from "./IndividualService";
 import {FormElementStatus} from "openchs-models";
-import {createEncounterType} from "../models/encounterModel";
 
 const removeStrictFromRuleCode = (rule) => isNil(rule) ? "" : rule.replace(/"use strict";|'use strict';/ig, '');
 
@@ -45,14 +44,12 @@ export const decisionRule = async (rule, entity) => {
             params: {decisions: defaultDecisions, entity, common, motherCalculations, services},
             imports: getImports()
         });
-        const trimmedDecisions = trimDecisionsMap(ruleDecisions);
-        return trimmedDecisions;
+        return trimDecisionsMap(ruleDecisions);
     } else if (!_.isEmpty(rulesFromTheBundle)) {
         const decisionsMap = rulesFromTheBundle.reduce((decisions, rule) => {
             return runRuleAndSaveFailure(rule, entityName, entity, decisions, new Date());
         }, defaultDecisions);
-        const trimmedDecisions = trimDecisionsMap(decisionsMap);
-        return trimmedDecisions;
+        return trimDecisionsMap(decisionsMap);
     }
     return defaultDecisions;
 };
@@ -64,11 +61,10 @@ export const visitScheduleRule = async (rule, entity, scheduledVisits) => {
 
     if (!isEmpty(code)) {
         const ruleFunc = evalRule(code);
-        const nextVisits = ruleFunc({
+        return ruleFunc({
             params: {visitSchedule: scheduledVisits, entity, common, motherCalculations, services},
             imports: getImports()
         });
-        return nextVisits;
     } else if (!isEmpty(rulesFromTheBundle)) {
         const nextVisits = rulesFromTheBundle
             .reduce((schedule, rule) => {
@@ -88,16 +84,13 @@ export const checkListRule = async (rule, entity, checklistDetails) => {
 
     if (!isEmpty(code)) {
         const ruleFunc = evalRule(code);
-        const checklists = ruleFunc({
+        return ruleFunc({
             params: {checklistDetails: checklistDetails, entity, common, motherCalculations, services},
             imports: getImports()
         });
-
-        return checklists;
     } else if (!isEmpty(rulesFromTheBundle)) {
-        const allChecklists = rulesFromTheBundle
+        return rulesFromTheBundle
             .reduce((checklists, rule) => runRuleAndSaveFailure(rule, entityName, entity, checklistDetails), []);
-        return allChecklists;
     }
     return [];
 };
@@ -108,15 +101,13 @@ export const programSummaryRule = async (rule, entity) => {
     const rulesFromTheBundle = await getAllRuleItemsFor(rule.formUuid, "EnrolmentSummary", "Program");
     if (!isEmpty(code)) {
         const ruleFunc = evalRule(code);
-        let summaries = ruleFunc({
+        return ruleFunc({
             params: {summaries: [], programEnrolment: entity, services},
             imports: getImports()
         });
-        return summaries;
     } else if (!isEmpty(rulesFromTheBundle)) {
-        const summaries = rulesFromTheBundle
+        return rulesFromTheBundle
             .reduce((summaries, rule) => runRuleAndSaveFailure(rule, entityName, entity, summaries, new Date()), []);
-        return summaries;
     }
     return [];
 };
@@ -125,11 +116,10 @@ export const subjectSummaryRule = async (rule, entity) => {
     const code = removeStrictFromRuleCode(rule.subjectSummaryCode);
     if (!isEmpty(code)) {
         const ruleFunc = evalRule(code);
-        let summaries = ruleFunc({
+        return ruleFunc({
             params: {summaries: [], individual: entity, services},
             imports: getImports()
         });
-        return summaries;
     }
     return [];
 };
@@ -166,8 +156,7 @@ export const messagingRule = async (rule, entity) => {
 const getAllRuleItemsFor = async (entityUuid, type, entityType) => {
     const applicableRules = RuleRegistry.getRulesFor(entityUuid, type, entityType); //Core module rules
     const additionalRules = await ruleService.getApplicableRules(entityUuid, type, entityType);
-    const ruleItems = sortBy(applicableRules.concat(additionalRules), r => r.executionOrder);
-    return ruleItems;
+    return sortBy(applicableRules.concat(additionalRules), r => r.executionOrder);
 };
 
 const runRuleAndSaveFailure = (rule, entityName, entity, ruleTypeValue, config, context) => {
