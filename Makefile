@@ -13,3 +13,12 @@ start: set-node-version
 
 test: set-node-version
 	npm test
+
+zip-app:
+	npm install
+	make zip-app-only
+
+zip-app-only:
+	-rm rules-server.tgz
+	tar -czvf rules-server.tgz  -C ../rules-server .
+
