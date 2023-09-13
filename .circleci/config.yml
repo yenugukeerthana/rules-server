@@ -84,7 +84,7 @@ jobs:
 
       - run: zip -r ~/rules-server.zip ../rules-server
 
-      - run: tar -czvf rules-server.tgz  -C ../rules-server .
+      - run: tar -czvf ~/rules-server.tgz  -C ../rules-server .
 
       - run: mkdir -p ~/artifacts
 
