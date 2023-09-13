@@ -84,17 +84,22 @@ jobs:
 
       - run: zip -r ~/rules-server.zip ../rules-server
 
+      - run: tar -czvf rules-server.tgz  -C ../rules-server .
+
       - run: mkdir -p ~/artifacts
 
       - run: echo $CIRCLE_BUILD_NUM > ~/artifacts/build_version
 
       - run: cp ~/rules-server.zip ~/artifacts/
 
+      - run: cp ~/rules-server.tgz ~/artifacts/
+
       - persist_to_workspace:
           root: ~/artifacts
           paths:
             - build_version
             - rules-server.zip
+            - rules-server.tgz
 
       - store_artifacts:
           path: ~/artifacts
