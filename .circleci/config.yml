@@ -32,7 +32,6 @@ commands:
             cd /opt/rules-server
             sudo chmod a+x /opt/rules-server/deploy/install.sh
             sudo /opt/rules-server/deploy/install.sh $OPENCHS_UPLOAD_USER_USER_NAME $OPENCHS_UPLOAD_USER_PASSWORD $AVNI_TZ
-            sudo rm -rf /tmp/rules-server.zip
             EOF
 
 jobs:
