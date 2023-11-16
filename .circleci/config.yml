@@ -114,21 +114,21 @@ jobs:
 
       - setup_remote_docker
 
-      - run: unzip ~/artifacts/rules-server.zip
+      - run: unzip ~/artifacts/rules-server.zip -d .
 
-      - run:
-          name: Determine Docker Tags
-          command: |
-            if [ "$CIRCLE_BRANCH" == "master" ]; then
-              DOCKER_TAG="latest"
-            elif [ -n "$CIRCLE_TAG" ]; then
-              DOCKER_TAG="$CIRCLE_TAG"
-            else
-              echo "No valid tag found. Exiting."
-              exit 1
-            fi
-            echo "export DOCKER_TAG=$DOCKER_TAG" >> $BASH_ENV
-          shell: /bin/sh
+      # - run:
+      #     name: Determine Docker Tags
+      #     command: |
+      #       if [ "$CIRCLE_BRANCH" == "master" ]; then
+      #         DOCKER_TAG="latest"
+      #       elif [ -n "$CIRCLE_TAG" ]; then
+      #         DOCKER_TAG="$CIRCLE_TAG"
+      #       else
+      #         echo "No valid tag found. Exiting."
+      #         exit 1
+      #       fi
+      #       echo "export DOCKER_TAG=$DOCKER_TAG" >> $BASH_ENV
+      #     shell: /bin/sh
 
       - run:
           name: Authenticate with Docker Hub
@@ -138,14 +138,19 @@ jobs:
       - run:
           name: Build Multi-Platform Docker Image
           command: |
-            cd rules-server
-            source $BASH_ENV
+            echo "ls -al"
+            ls -al
+            echo "PWD-1"
+            pwd
+            echo "ls -al"
+            ls -al
+            # source $BASH_ENV
             docker buildx create --use
-            docker buildx build --platform linux/amd64,linux/arm64 --tag "$DOCKER_USERNAME/rules-server:${DOCKER_TAG}" --push -f Dockerfile .
-            if [ "$CIRCLE_BRANCH" == "master" ]; then
-              SHORT_CIRCLE_SHA=$(echo "$CIRCLE_SHA1" | cut -c1-6)
-              docker buildx build --platform linux/amd64,linux/arm64 --tag "$DOCKER_USERNAME/rules-server:${SHORT_CIRCLE_SHA}" --push -f Dockerfile .
-            fi
+            docker buildx build --platform linux/amd64,linux/arm64 --tag "$DOCKER_USERNAME/rules-server:branch" --push -f Dockerfile .
+            # if [ "$CIRCLE_BRANCH" == "master" ]; then
+            #   SHORT_CIRCLE_SHA=$(echo "$CIRCLE_SHA1" | cut -c1-6)
+            #   docker buildx build --platform linux/amd64,linux/arm64 --tag "$DOCKER_USERNAME/rules-server:${SHORT_CIRCLE_SHA}" --push -f Dockerfile .
+            # fi
 
   STAGING_deploy:
     docker:
@@ -185,12 +190,12 @@ workflows:
   version: 2
   test_and_build:
     jobs:
-      - app_test:
-          <<: *tags_filter
-      - app_build:
-          <<: *tags_filter
-          requires:
-            - app_test
+      # - app_test:
+      #     <<: *tags_filter
+      - app_build
+          # <<: *tags_filter
+          # requires:
+          #   - app_test
       - build_docker_image:
           context: dockerhub
           requires:
@@ -198,8 +203,6 @@ workflows:
           filters:
             tags:
               only: /.*/
-            branches:
-              only: master
       - STAGING_deploy:
           context: non-prod-deploy
           filters:
